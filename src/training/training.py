@@ -33,7 +33,7 @@ mlflow_tracking_uri = config["model_config"]["mlflow_tracking_uri"]
 if not mlflow_tracking_uri.startswith("http"):
     raise ValueError(f"ERREUR : MLFLOW_TRACKING_URI invalide")
 
-print(f"MLflow va utiliser L'URI)
+print(f"MLflow va utiliser L'URI")
 
 mlflow.set_tracking_uri(mlflow_tracking_uri)
 mlflow.set_registry_uri(mlflow_tracking_uri)
