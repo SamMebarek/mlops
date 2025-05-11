@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1746988868305
+current_stage: None
+description: ''
+last_updated_timestamp: 1746988868305
+name: BestModel
+run_id: b5393a038f234ad9be07b935ea6eb374
+run_link: ''
+source: mlflow-artifacts:/354600503478473566/b5393a038f234ad9be07b935ea6eb374/artifacts/xgb_model
+status: READY
+status_message: null
+storage_location: mlflow-artifacts:/354600503478473566/b5393a038f234ad9be07b935ea6eb374/artifacts/xgb_model
+user_id: null
+version: 18

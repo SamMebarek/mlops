@@ -1,0 +1,32 @@
+version: "3.8"  # Optionnel maintenant, mais on peut le garder
+
+services:
+
+  preprocessing:
+    build:
+      context: ./services/preprocessing
+    volumes:
+      - ./data:/app/data
+      - ./params.yaml:/app/params.yaml
+
+  training:
+    build:
+      context: ./services/training
+    volumes:
+      - ./data:/app/data
+      - ./params.yaml:/app/params.yaml
+    depends_on:
+      - preprocessing
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.12.1
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlflow/mlruns
+    command: >
+      mlflow server
+      --backend-store-uri /mlflow/mlruns
+      --host 0.0.0.0
