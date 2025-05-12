@@ -30,3 +30,18 @@ services:
       mlflow server
       --backend-store-uri /mlflow/mlruns
       --host 0.0.0.0
+
+
+  api:
+    build:
+      context: ./services/api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./params.yaml:/app/params.yaml
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+    
+      - mlflow
