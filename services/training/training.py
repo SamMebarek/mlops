@@ -15,36 +15,7 @@ from dotenv import load_dotenv
 # Chargement des variables d'environnement
 load_dotenv()
 
-# Chargement du fichier de configuration
-with open("params.yaml", "r", encoding="utf-8") as f:
-    config = yaml.safe_load(f)
-
-# Remplacement des valeurs ${VAR} par les valeurs d'environnement
-for section in config:
-    if isinstance(config[section], dict):
-        for key, value in config[section].items():
-            if isinstance(value, str) and "${" in value:
-                env_var = value.strip("${}").strip()
-                if env_var in os.environ:
-                    config[section][key] = os.getenv(env_var)
-
-# Configuration de MLflow
-mlflow_tracking_uri = config["model_config"]["mlflow_tracking_uri"]
-if not mlflow_tracking_uri or not mlflow_tracking_uri.startswith("http"):
-    raise ValueError("ERREUR : MLFLOW_TRACKING_URI invalide")
-
-print(f"MLflow va utiliser l'URI : {mlflow_tracking_uri}")
-
-mlflow.set_tracking_uri(mlflow_tracking_uri)
-mlflow.set_registry_uri(mlflow_tracking_uri)
-
-# Vérification que l'URI a bien été prise en compte
-assert mlflow.get_tracking_uri() == mlflow_tracking_uri, "MLflow n'a pas pris l'URI en compte"
-
-# Définition de l'expérience
-mlflow.set_experiment(config["model_config"]["mlflow_experiment_name"])
-
-# Configuration du logger
+# Configuration du logging
 os.makedirs("logs", exist_ok=True)
 logging.basicConfig(
     filename=os.path.join("logs", "training.log"),
@@ -54,26 +25,52 @@ logging.basicConfig(
 logger = logging.getLogger("training")
 
 
+def charger_config():
+    with open("params.yaml", "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+
+    # Remplace les ${VAR} par les vraies valeurs d'env
+    for section in config:
+        if isinstance(config[section], dict):
+            for key, value in config[section].items():
+                if isinstance(value, str) and "${" in value:
+                    env_var = value.strip("${}").strip()
+                    if env_var in os.environ:
+                        config[section][key] = os.getenv(env_var)
+    return config
+
+
 def main():
+    config = charger_config()
     train_params = config["train"]
     model_config = config["model_config"]
 
-    logger.info("Début de l'entraînement du modèle.")
+    # Config MLflow
+    mlflow_tracking_uri = model_config["mlflow_tracking_uri"]
+    if not mlflow_tracking_uri or not mlflow_tracking_uri.startswith("http"):
+        raise ValueError("🚨 ERREUR : MLFLOW_TRACKING_URI invalide")
+
+    print(f"📡 MLflow va utiliser l'URI : {mlflow_tracking_uri}")
+    mlflow.set_tracking_uri(mlflow_tracking_uri)
+    mlflow.set_registry_uri(mlflow_tracking_uri)
+    mlflow.set_experiment(model_config["mlflow_experiment_name"])
 
     # Chargement des données
     data_path = train_params["input"]
     if not os.path.exists(data_path):
+        print(f"❌ Fichier prétraité introuvable : {data_path}")
         logger.error(f"Fichier prétraité introuvable : {data_path}")
         return
 
     df = pd.read_csv(data_path)
+    print(f"📄 Données chargées : {df.shape}")
     logger.info(f"Données chargées, shape = {df.shape}")
 
     if "Prix" not in df.columns:
+        print("❌ La colonne 'Prix' est manquante.")
         logger.error("La colonne 'Prix' est manquante.")
         return
 
-    # Séparation des features et de la target
     y = df["Prix"].values
     X = (
         df.drop(columns=["Prix", "SKU", "Timestamp"], errors="ignore")
@@ -88,18 +85,17 @@ def main():
         random_state=train_params["random_state"],
     )
 
-    # Définition des distributions pour la recherche d'hyperparamètres
-    dist_params = train_params["param_dist"]
+    # Hyperparamètres
+    dist = train_params["param_dist"]
     param_dist = {
-        "n_estimators": randint(dist_params["n_estimators_min"], dist_params["n_estimators_max"]),
-        "learning_rate": uniform(dist_params["learning_rate_min"], dist_params["learning_rate_max"] - dist_params["learning_rate_min"]),
-        "max_depth": randint(dist_params["max_depth_min"], dist_params["max_depth_max"]),
-        "subsample": uniform(dist_params["subsample_min"], dist_params["subsample_max"] - dist_params["subsample_min"]),
-        "colsample_bytree": uniform(dist_params["colsample_bytree_min"], dist_params["colsample_bytree_max"] - dist_params["colsample_bytree_min"]),
-        "gamma": uniform(dist_params["gamma_min"], dist_params["gamma_max"] - dist_params["gamma_min"]),
+        "n_estimators": randint(dist["n_estimators_min"], dist["n_estimators_max"]),
+        "learning_rate": uniform(dist["learning_rate_min"], dist["learning_rate_max"] - dist["learning_rate_min"]),
+        "max_depth": randint(dist["max_depth_min"], dist["max_depth_max"]),
+        "subsample": uniform(dist["subsample_min"], dist["subsample_max"] - dist["subsample_min"]),
+        "colsample_bytree": uniform(dist["colsample_bytree_min"], dist["colsample_bytree_max"] - dist["colsample_bytree_min"]),
+        "gamma": uniform(dist["gamma_min"], dist["gamma_max"] - dist["gamma_min"]),
     }
 
-    # Initialisation du modèle et entraînement
     model_xgb = RandomizedSearchCV(
         XGBRegressor(objective="reg:squarederror", random_state=train_params["random_state"]),
         param_distributions=param_dist,
@@ -111,6 +107,7 @@ def main():
     )
 
     with mlflow.start_run(run_name="XGBoost_RandSearch") as run:
+        print("🚀 Entraînement du modèle en cours...")
         logger.info("Recherche des meilleurs hyperparamètres XGBoost.")
         model_xgb.fit(X_train, y_train)
 
@@ -120,13 +117,14 @@ def main():
 
         logger.info(f"Meilleurs paramètres : {best_params}")
         logger.info(f"Score R² : {r2:.4f}")
+        print(f"📈 Score R² : {r2:.4f}")
+        print(f"🏅 Meilleurs paramètres : {best_params}")
 
-        # Log dans MLflow
+        # Logging MLflow
         mlflow.log_metric("r2_score", r2)
         for param, value in best_params.items():
             mlflow.log_param(param, value)
 
-        # Log du modèle
         input_example = X_test.iloc[:1]
         signature = infer_signature(X_train, model_xgb.best_estimator_.predict(X_train))
 
@@ -139,7 +137,7 @@ def main():
         )
 
         print(f"✅ Modèle entraîné et loggé avec succès. R² : {r2:.4f}")
-
+        print(f"🧪 Voir l'expérience sur : {mlflow_tracking_uri}")
 
 if __name__ == "__main__":
     main()
