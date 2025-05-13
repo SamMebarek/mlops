@@ -32,8 +32,10 @@ MLFLOW_EXPERIMENT = config["model_config"]["mlflow_experiment_name"]
 MLFLOW_MODEL_NAME = config["model_config"]["mlflow_model_name"]
 
 # Vérification et forçage de MLflow
-if not MLFLOW_TRACKING_URI.startswith("http"):
-    raise ValueError(f"🚨 ERREUR : MLFLOW_TRACKING_URI invalide")
+if __name__ == "__main__" or os.getenv("RUN_CONTEXT") == "production":
+    if not MLFLOW_TRACKING_URI.startswith("http"):
+        raise ValueError("🚨 ERREUR : MLFLOW_TRACKING_URI invalide")
+
 
 print(f"MLflow va utiliser l'URI")
 
