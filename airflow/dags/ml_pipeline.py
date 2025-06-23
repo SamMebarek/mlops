@@ -5,31 +5,50 @@ import subprocess
 import os
 import sys
 
-# S'assurer que Airflow voit le projet monté
-sys.path.append("/opt/airflow/project")
+# Ajouter le chemin vers le dossier src pour les imports dans le DAG (pas utile dans subprocess)
+sys.path.append("/opt/airflow/project/src")
 
-# Définir les chemins vers les fichiers de configuration
+# Chemins vers les fichiers de configuration
 CONFIG_PATH = "/opt/airflow/project/config/config.yaml"
 PARAMS_PATH = "/opt/airflow/project/config/params.yaml"
 
+# Fonctions appelées dans les tâches Airflow
 def run_ingestion():
-    subprocess.run(["python", "/opt/airflow/project/src/ingestion/main.py", "--config", CONFIG_PATH, "--params", PARAMS_PATH], check=True)
+    subprocess.run([
+        "python", "-m", "ingestion.components.data_ingestion",
+        "--config", CONFIG_PATH,
+        "--params", PARAMS_PATH
+    ], check=True, cwd="/opt/airflow/project/src")
 
 def run_preprocessing():
-    subprocess.run(["python", "/opt/airflow/project/src/preprocessing/main.py", "--config", CONFIG_PATH, "--params", PARAMS_PATH], check=True)
+    subprocess.run([
+        "python", "-m", "preprocessing.components.preprocess",
+        "--config", CONFIG_PATH,
+        "--params", PARAMS_PATH
+    ], check=True, cwd="/opt/airflow/project/src")
 
 def run_training():
-    subprocess.run(["python", "/opt/airflow/project/src/training/main.py", "--config", CONFIG_PATH, "--params", PARAMS_PATH], check=True)
+    subprocess.run([
+        "python", "-m", "training.components.train",
+        "--config", CONFIG_PATH,
+        "--params", PARAMS_PATH
+    ], check=True, cwd="/opt/airflow/project/src")
 
 def run_evaluation():
-    subprocess.run(["python", "/opt/airflow/project/src/evaluation/main.py", "--config", CONFIG_PATH, "--params", PARAMS_PATH], check=True)
+    subprocess.run([
+        "python", "-m", "evaluation.components.evaluate",
+        "--config", CONFIG_PATH,
+        "--params", PARAMS_PATH
+    ], check=True, cwd="/opt/airflow/project/src")
 
+# Paramètres du DAG
 default_args = {
     'owner': 'sarah',
     'start_date': datetime(2024, 1, 1),
     'retries': 1,
 }
 
+# Définition du DAG
 with DAG(
     dag_id='ml_pipeline',
     default_args=default_args,

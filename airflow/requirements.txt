@@ -1,0 +1,6 @@
+python-box<5
+xgboost
+scikit-learn
+pandas
+pyyaml
+mlflow

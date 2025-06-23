@@ -1,7 +1,7 @@
 # config/config.yaml
 
 data_ingestion:
-  source_URL: "data/ingestion/donnees_synthetiques.csv"      # URL ou chemin local du CSV à ingérer
+  source_URL: "/opt/airflow/project/data/ingestion/donnees_synthetiques.csv"      # URL ou chemin local du CSV à ingérer
   raw_data_dir: "data/raw"                         # Dossier où stocker le CSV ingéré
   ingested_file_name: "ingested_data.csv"          # Nom du fichier ingéré
 

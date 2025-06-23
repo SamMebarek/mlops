@@ -57,7 +57,6 @@ services:
       - ./config:/app/config
       - ./data/processed:/app/data/processed
 
-
   frontend:
     image: samdataiken/frontend-service:dev
     build:
@@ -81,7 +80,9 @@ services:
       - postgres_db:/var/lib/postgresql/data
 
   airflow-webserver:
-    image: apache/airflow:2.8.1
+    build:
+      context: .
+      dockerfile: airflow/Dockerfile.airflow
     restart: always
     depends_on:
       - postgres
@@ -98,6 +99,7 @@ services:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
+      - .:/opt/airflow/project
     command: >
       bash -c "
       airflow db upgrade &&
@@ -106,7 +108,9 @@ services:
       "
 
   airflow-scheduler:
-    image: apache/airflow:2.8.1
+    build:
+      context: .
+      dockerfile: airflow/Dockerfile.airflow
     restart: always
     depends_on:
       - postgres
@@ -118,6 +122,7 @@ services:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
+      - .:/opt/airflow/project
     command: >
       bash -c "
       airflow db upgrade &&

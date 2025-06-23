@@ -3,3 +3,4 @@ PyYAML==6.0.2
 starlette
 uvicorn
 jinja2
+python-box<5

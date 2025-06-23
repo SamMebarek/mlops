@@ -8,3 +8,5 @@ PyYAML==6.0.2
 scikit_learn==1.7.0
 scipy==1.15.3
 xgboost==3.0.2
+python-box<5
+scikit-learn

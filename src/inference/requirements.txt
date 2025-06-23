@@ -10,3 +10,4 @@ PyYAML==6.0.2
 starlette
 uvicorn==0.34.3
 xgboost
+python-box<5

@@ -1,6 +1,6 @@
 # config/params.yaml
 ingestion:
-  input: ""                               # Laisser vide si on utilise toujours source_URL
+  input: "data/ingestion/donnees_synthetiques.csv"                               # Laisser vide si on utilise toujours source_URL
   output: "data/raw/ingested_data.csv"    # Chemin de sortie local pour le CSV ingéré
 
 preprocessing:
