@@ -1,0 +1,60 @@
+# config/config.yaml
+
+data_ingestion:
+  source_URL: "data/ingestion/donnees_synthetiques.csv"      # URL ou chemin local du CSV à ingérer
+  raw_data_dir: "data/raw"                         # Dossier où stocker le CSV ingéré
+  ingested_file_name: "ingested_data.csv"          # Nom du fichier ingéré
+
+data_preprocessing:
+  raw_data_path: "data/raw/ingested_data.csv"
+  processed_dir:   "data/processed"
+  clean_file_name: "clean_data.csv"
+
+training:
+  # Where to read the preprocessed CSV
+  processed_data_path: "data/processed/clean_data.csv"
+  # Where to write your trained model
+  model_dir: "models"
+  # Filename for the serialized model
+  model_file_name: "xgb_model.pkl"
+
+model_config:
+  # MLflow settings
+  mlflow_tracking_uri: "https://dagshub.com/SamMebarek/mlops-som.mlflow"
+  mlflow_experiment_name: "price_fixer_experiment"
+  mlflow_model_name: "PriceFixerModel"
+
+evaluation:
+  processed_data_path: "data/processed/clean_data.csv"
+  model_path:           "models/xgb_model.pkl"
+  metrics_output_path:  "evaluation/scores.json"
+  mlflow_tracking_uri:  "https://dagshub.com/SamMebarek/mlops-som.mlflow"
+  mlflow_experiment_name: "price_fixer_experiment"
+  mlflow_model_name:     "PriceFixerModel"
+
+
+
+inference:
+  # Où se trouve le CSV local (sera aussi target DVC)
+  data_csv_path: "data/processed/clean_data.csv"
+  # Cible DVC à pull avant lecture
+  dvc_target: "data/processed/clean_data.csv"
+
+  # MLflow
+  mlflow_tracking_uri: "https://dagshub.com/SamMebarek/mlops-som.mlflow"
+  mlflow_model_name: "PriceFixerModel"
+
+  # Serveur FastAPI
+  host: "0.0.0.0"
+  port: 8080
+  log_level: "INFO"
+  admin_user: "user"
+  admin_password: "pwd"
+
+frontend:
+  api_base_url: "http://localhost:8080"      # URL du backend FastAPI
+  auth_realm: "MLOps Demo Admin" 
+  api_url: "http://localhost:8080"
+           # Realm pour l’authentification Basic
+
+  

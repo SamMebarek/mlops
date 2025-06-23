@@ -1,57 +1,158 @@
 schema: '2.0'
 stages:
-  ingestion:
-    cmd: python src/ingestion/ingestion.py
+  data_ingestion:
+    cmd: python -m ingestion.components.data_ingestion --config ../config/config.yaml
+      --params ../config/params.yaml
     deps:
-    - path: data/donnees_synthetiques.csv
+    - path: ../config/config.yaml
       hash: md5
-      md5: d8bd7767e96bb828e46b3057d5b6a40a
-      size: 25889126
-    - path: params.yaml
+      md5: 6818af5fc9c23dc7fc4b6056615a07fe
+      size: 1740
+    - path: ../config/params.yaml
       hash: md5
-      md5: ab2ac3405501defc2cd97eae174d0605
-      size: 1029
-    - path: src/ingestion/ingestion.py
+      md5: 7b043bdb1dc580b355f7773ab23f85c6
+      size: 1079
+    - path: ingestion/components/data_ingestion.py
       hash: md5
-      md5: aa4f6c76b04dc7ef4dd9040d3cf6a9e9
-      size: 3851
+      md5: ee72840a8ca77eb7f95169a4a41cc3bf
+      size: 3442
+    - path: ingestion/config/configuration.py
+      hash: md5
+      md5: a10213bfc1c6e14ba0b36f1bb23bd4f5
+      size: 1405
+    - path: ingestion/entity/config_entity.py
+      hash: md5
+      md5: 3f3a2c7fc84f75f6b019eb2db534e7c3
+      size: 499
+    - path: ingestion/utils/common.py
+      hash: md5
+      md5: 0539c998f10ee6daf0842a62660695a3
+      size: 1222
     outs:
-    - path: data/raw/ingested_data.csv
+    - path: ../data/raw/ingested_data.csv
       hash: md5
-      md5: bcd7572693340afc67d43380c06602a2
-      size: 25482725
-  preprocessing:
-    cmd: python src/preprocessing/preprocessing.py
+      md5: 4cee207782f6028f45e95ff851842eb9
+      size: 25460383
+  data_preprocessing:
+    cmd: python -m preprocessing.components.preprocess --config ../config/config.yaml
+      --params ../config/params.yaml
     deps:
-    - path: data/raw/ingested_data.csv
+    - path: ../config/config.yaml
       hash: md5
-      md5: bcd7572693340afc67d43380c06602a2
-      size: 25482725
-    - path: params.yaml
+      md5: 6818af5fc9c23dc7fc4b6056615a07fe
+      size: 1740
+    - path: ../config/params.yaml
       hash: md5
-      md5: ab2ac3405501defc2cd97eae174d0605
-      size: 1029
-    - path: src/preprocessing/preprocessing.py
+      md5: 7b043bdb1dc580b355f7773ab23f85c6
+      size: 1079
+    - path: ../data/raw/ingested_data.csv
       hash: md5
-      md5: 605635befe4146daf7b06065519aec18
-      size: 4666
+      md5: 4cee207782f6028f45e95ff851842eb9
+      size: 25460383
+    - path: preprocessing/components/preprocess.py
+      hash: md5
+      md5: 94bbc64b235ad72cd9359fdc18982164
+      size: 3078
+    - path: preprocessing/config/configuration.py
+      hash: md5
+      md5: 6ed8858dc310af0852c36fe98b827633
+      size: 1655
+    - path: preprocessing/entity/config_entity.py
+      hash: md5
+      md5: 32e745047e22fd6332e86a991c164f8d
+      size: 560
+    - path: preprocessing/repository/repository.py
+      hash: md5
+      md5: c070ab6e85da803bb8ba51c2f4872acc
+      size: 1046
+    - path: preprocessing/utils/common.py
+      hash: md5
+      md5: d1820698d36c5dbdc7ad8ade00773ca8
+      size: 1916
     outs:
-    - path: data/processed/preprocessed_data.csv
+    - path: ../data/processed/clean_data.csv
       hash: md5
-      md5: 25b171e8d5d56c220d17982bb618fb7b
-      size: 21246632
-  training:
-    cmd: python src/training/training.py
+      md5: bdb6be2691a8ddb070ec3d74cac15833
+      size: 19736234
+  model_training:
+    cmd: "python -m training.components.train --config ../config/config.yaml --params
+      ../config/params.yaml\n"
     deps:
-    - path: data/processed/preprocessed_data.csv
+    - path: ../config/config.yaml
       hash: md5
-      md5: 25b171e8d5d56c220d17982bb618fb7b
-      size: 21246632
-    - path: params.yaml
+      md5: 6818af5fc9c23dc7fc4b6056615a07fe
+      size: 1740
+    - path: ../config/params.yaml
       hash: md5
-      md5: ab2ac3405501defc2cd97eae174d0605
-      size: 1029
-    - path: src/training/training.py
+      md5: 7b043bdb1dc580b355f7773ab23f85c6
+      size: 1079
+    - path: ../data/processed/clean_data.csv
       hash: md5
-      md5: 797fcb64e5f79222cc6570bdb7d98a8f
-      size: 5257
+      md5: bdb6be2691a8ddb070ec3d74cac15833
+      size: 19736234
+    - path: training/components/train.py
+      hash: md5
+      md5: bf80886cb3bcf12c66a25105ca6b8848
+      size: 4800
+    - path: training/config/configuration.py
+      hash: md5
+      md5: 2235cae8ec8d10bdb870ed5538143658
+      size: 2197
+    - path: training/entity/config_entity.py
+      hash: md5
+      md5: bf9f7ead3a9297fd9070d9be0b6a66c1
+      size: 877
+    - path: training/repository/repository.py
+      hash: md5
+      md5: c772ed476e85a4db682f1e55e51b0f53
+      size: 1310
+    - path: training/utils/common.py
+      hash: md5
+      md5: 9808e5324a9430fe4680694928b24a2b
+      size: 1940
+    outs:
+    - path: ../models/xgb_model.pkl
+      hash: md5
+      md5: ecba7c132ce9460af2490940f8306ddf
+      size: 531410
+  data_evaluation:
+    cmd: "python -m evaluation.components.evaluate --config ../config/config.yaml
+      --params ../config/params.yaml\n"
+    deps:
+    - path: ../config/config.yaml
+      hash: md5
+      md5: 6818af5fc9c23dc7fc4b6056615a07fe
+      size: 1740
+    - path: ../config/params.yaml
+      hash: md5
+      md5: 7b043bdb1dc580b355f7773ab23f85c6
+      size: 1079
+    - path: ../data/processed/clean_data.csv
+      hash: md5
+      md5: bdb6be2691a8ddb070ec3d74cac15833
+      size: 19736234
+    - path: ../models/xgb_model.pkl
+      hash: md5
+      md5: ecba7c132ce9460af2490940f8306ddf
+      size: 531410
+    - path: evaluation/components/evaluate.py
+      hash: md5
+      md5: 63fbda37a3233536e019e6b01bf45bc5
+      size: 2750
+    - path: evaluation/config/configuration.py
+      hash: md5
+      md5: 4b40d5e5fd509aba06bde33657092553
+      size: 1852
+    - path: evaluation/entity/config_entity.py
+      hash: md5
+      md5: 7b89701591366c54b8784643c0c23b21
+      size: 791
+    - path: evaluation/utils/common.py
+      hash: md5
+      md5: 29ab1e866998f80f2c6249ea653128c0
+      size: 2477
+    outs:
+    - path: ../evaluation/scores.json
+      hash: md5
+      md5: 2f7c21ca913a032d147c78de16042086
+      size: 71

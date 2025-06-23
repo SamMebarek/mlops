@@ -1,0 +1,45 @@
+# config/params.yaml
+ingestion:
+  input: ""                               # Laisser vide si on utilise toujours source_URL
+  output: "data/raw/ingested_data.csv"    # Chemin de sortie local pour le CSV ingéré
+
+preprocessing:
+  drop_na: true
+  columns_to_keep:
+    - SKU
+    - Prix
+    - Timestamp
+    - AgeProduitEnJours
+    - QuantiteVendue
+    - UtiliteProduit
+    - ElasticitePrix
+    - Remise
+    - Qualite
+    - Mois_sin
+    - Mois_cos
+    - Heure_sin
+    - Heure_cos
+
+training:
+  epochs: 20            # nombre d’époques
+  batch_size: 64        # taille de batch
+  learning_rate: 0.01   # taux d’apprentissa
+
+  # Hyperparameters for train_test_split
+  test_size: 0.2
+  random_seed: 17
+
+  # Hyperparameter search ranges
+  param_dist:
+    n_estimators_min: 50
+    n_estimators_max: 200
+    learning_rate_min: 0.01
+    learning_rate_max: 0.2
+    max_depth_min: 3
+    max_depth_max: 7
+    subsample_min: 0.6
+    subsample_max: 1.0
+    colsample_bytree_min: 0.6
+    colsample_bytree_max: 1.0
+    gamma_min: 0
+    gamma_max: 0.3

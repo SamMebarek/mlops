@@ -1,27 +1,66 @@
 # dvc.yaml
+# dvc.yaml (au format DVC 3.x, sans erreur de "extra keys" ni de double "src/")
+
 stages:
-  ingestion:
-    cmd: python src/ingestion/ingestion.py
+  data_ingestion:
+    cmd: python -m ingestion.components.data_ingestion --config ../config/config.yaml --params ../config/params.yaml
+    wdir: src
     deps:
-      - src/ingestion/ingestion.py
-      - data/donnees_synthetiques.csv
-      - params.yaml                   
+      - ingestion/components/data_ingestion.py
+      - ingestion/config/configuration.py
+      - ingestion/entity/config_entity.py
+      - ingestion/utils/common.py
+      - ../config/config.yaml
+      - ../config/params.yaml
     outs:
-      - data/raw/ingested_data.csv    
+      - ../data/raw/ingested_data.csv
 
-  preprocessing:
-    cmd: python src/preprocessing/preprocessing.py
+  data_preprocessing:
+    cmd: python -m preprocessing.components.preprocess --config ../config/config.yaml --params ../config/params.yaml
+    wdir: src
     deps:
-      - src/preprocessing/preprocessing.py
-      - data/raw/ingested_data.csv    
-      - params.yaml
+      - preprocessing/components/preprocess.py
+      - preprocessing/config/configuration.py
+      - preprocessing/entity/config_entity.py
+      - preprocessing/utils/common.py
+      - preprocessing/repository/repository.py
+      - ../config/config.yaml
+      - ../config/params.yaml
+      - ../data/raw/ingested_data.csv
     outs:
-      - data/processed/preprocessed_data.csv
+      - ../data/processed/clean_data.csv
 
-  training:
-    cmd: python src/training/training.py
+  model_training:
+    cmd: >
+      python -m training.components.train
+      --config ../config/config.yaml
+      --params ../config/params.yaml
+    wdir: src
     deps:
-      - src/training/training.py
-      - data/processed/preprocessed_data.csv
-      - params.yaml
-    outs: [] 
+      - training/components/train.py
+      - training/config/configuration.py
+      - training/entity/config_entity.py
+      - training/utils/common.py
+      - training/repository/repository.py
+      - ../config/config.yaml
+      - ../config/params.yaml
+      - ../data/processed/clean_data.csv
+    outs:
+      - ../models/xgb_model.pkl
+  data_evaluation:
+    cmd: >
+      python -m evaluation.components.evaluate
+      --config ../config/config.yaml
+      --params ../config/params.yaml
+    wdir: src
+    deps:
+      - evaluation/components/evaluate.py
+      - evaluation/config/configuration.py
+      - evaluation/entity/config_entity.py
+      - evaluation/utils/common.py
+      - ../config/config.yaml
+      - ../config/params.yaml
+      - ../data/processed/clean_data.csv
+      - ../models/xgb_model.pkl
+    outs:
+      - ../evaluation/scores.json

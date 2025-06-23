@@ -1,0 +1,10 @@
+joblib==1.4.2
+mlflow==2.22.1
+mlflow_skinny==2.22.1
+pandas
+python-dotenv==1.1.0
+python_box==7.3.2
+PyYAML==6.0.2
+scikit_learn==1.7.0
+scipy==1.15.3
+xgboost==3.0.2

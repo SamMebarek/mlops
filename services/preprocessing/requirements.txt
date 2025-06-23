@@ -1,4 +1,0 @@
-pandas
-pyyaml
-python-dotenv
-scikit-learn

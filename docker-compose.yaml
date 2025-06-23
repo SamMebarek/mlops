@@ -1,0 +1,73 @@
+
+
+services:
+  ingestion:
+    image: samdataiken/ingestion-service:dev
+    build:
+      context: .
+      dockerfile: src/ingestion/Dockerfile
+    volumes:
+      - ./config:/app/config
+      - ./data/ingestion:/app/data/ingestion
+      - ./data/raw:/app/data/raw
+
+  preprocessing:
+    image: samdataiken/preprocessing-service:dev
+    build:
+      context: .
+      dockerfile: src/preprocessing/Dockerfile
+    volumes:
+      - ./config:/app/config
+      - ./data/raw:/app/data/raw
+      - ./data/processed:/app/data/processed
+
+  training:
+    image: samdataiken/training-service:dev
+    build:
+      context: .
+      dockerfile: src/training/Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./config:/app/config
+      - ./data/processed:/app/data/processed
+      - ./models:/app/models
+
+  evaluation:
+    image: samdataiken/evaluation-service:dev
+    build:
+      context: .
+      dockerfile: src/evaluation/Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./config:/app/config
+      - ./data/processed:/app/data/processed
+      - ./models:/app/models
+      - ./evaluation:/app/evaluation
+
+  inference:
+    image: samdataiken/inference-service:dev
+    build:
+      context: .
+      dockerfile: src/inference/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config:/app/config
+      - ./data/processed:/app/data/processed
+
+
+  frontend:
+    image: samdataiken/frontend-service:dev
+    build:
+      context: .
+      dockerfile: src/frontend/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config:/app/config
+      - ./src/frontend/static:/app/static
+      - ./src/frontend/templates:/app/templates
