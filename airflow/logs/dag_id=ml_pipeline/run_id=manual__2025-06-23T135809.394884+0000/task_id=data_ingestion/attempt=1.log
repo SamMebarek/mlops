@@ -1,0 +1,26 @@
+[2025-06-23T13:58:10.698+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ml_pipeline.data_ingestion manual__2025-06-23T13:58:09.394884+00:00 [queued]>
+[2025-06-23T13:58:10.711+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ml_pipeline.data_ingestion manual__2025-06-23T13:58:09.394884+00:00 [queued]>
+[2025-06-23T13:58:10.713+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-06-23T13:58:10.737+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): data_ingestion> on 2025-06-23 13:58:09.394884+00:00
+[2025-06-23T13:58:10.746+0000] {standard_task_runner.py:60} INFO - Started process 192 to run task
+[2025-06-23T13:58:10.752+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'ml_pipeline', 'data_ingestion', 'manual__2025-06-23T13:58:09.394884+00:00', '--job-id', '2', '--raw', '--subdir', 'DAGS_FOLDER/ml_pipeline.py', '--cfg-path', '/tmp/tmp2r_dpwjl']
+[2025-06-23T13:58:10.755+0000] {standard_task_runner.py:88} INFO - Job 2: Subtask data_ingestion
+[2025-06-23T13:58:10.846+0000] {task_command.py:423} INFO - Running <TaskInstance: ml_pipeline.data_ingestion manual__2025-06-23T13:58:09.394884+00:00 [running]> on host 010b5ad074ce
+[2025-06-23T13:58:10.981+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='sarah' AIRFLOW_CTX_DAG_ID='ml_pipeline' AIRFLOW_CTX_TASK_ID='data_ingestion' AIRFLOW_CTX_EXECUTION_DATE='2025-06-23T13:58:09.394884+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-06-23T13:58:09.394884+00:00'
+[2025-06-23T13:58:11.032+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/ml_pipeline.py", line 16, in run_ingestion
+    subprocess.run(["python", "/opt/airflow/project/src/ingestion/main.py", "--config", CONFIG_PATH, "--params", PARAMS_PATH], check=True)
+  File "/usr/local/lib/python3.8/subprocess.py", line 516, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['python', '/opt/airflow/project/src/ingestion/main.py', '--config', '/opt/airflow/project/config/config.yaml', '--params', '/opt/airflow/project/config/params.yaml']' returned non-zero exit status 2.
+[2025-06-23T13:58:11.051+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=ml_pipeline, task_id=data_ingestion, execution_date=20250623T135809, start_date=20250623T135810, end_date=20250623T135811
+[2025-06-23T13:58:11.077+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 2 for task data_ingestion (Command '['python', '/opt/airflow/project/src/ingestion/main.py', '--config', '/opt/airflow/project/config/config.yaml', '--params', '/opt/airflow/project/config/params.yaml']' returned non-zero exit status 2.; 192)
+[2025-06-23T13:58:11.089+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-06-23T13:58:11.132+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

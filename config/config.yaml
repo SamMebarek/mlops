@@ -20,7 +20,7 @@ training:
 
 model_config:
   # MLflow settings
-  mlflow_tracking_uri: "https://dagshub.com/SamMebarek/mlops-som.mlflow"
+  mlflow_tracking_uri: "https://dagshub.com/Gsasana/rakuten-mlops.mlflow"
   mlflow_experiment_name: "price_fixer_experiment"
   mlflow_model_name: "PriceFixerModel"
 
@@ -28,7 +28,7 @@ evaluation:
   processed_data_path: "data/processed/clean_data.csv"
   model_path:           "models/xgb_model.pkl"
   metrics_output_path:  "evaluation/scores.json"
-  mlflow_tracking_uri:  "https://dagshub.com/SamMebarek/mlops-som.mlflow"
+  mlflow_tracking_uri:  "https://dagshub.com/Gsasana/rakuten-mlops.mlflow"
   mlflow_experiment_name: "price_fixer_experiment"
   mlflow_model_name:     "PriceFixerModel"
 
@@ -41,7 +41,7 @@ inference:
   dvc_target: "data/processed/clean_data.csv"
 
   # MLflow
-  mlflow_tracking_uri: "https://dagshub.com/SamMebarek/mlops-som.mlflow"
+  mlflow_tracking_uri: "https://dagshub.com/Gsasana/rakuten-mlops.mlflow"
   mlflow_model_name: "PriceFixerModel"
 
   # Serveur FastAPI
