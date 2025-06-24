@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   ingestion:
     image: samdataiken/ingestion-service:dev
@@ -8,6 +10,8 @@ services:
       - ./config:/app/config
       - ./data/ingestion:/app/data/ingestion
       - ./data/raw:/app/data/raw
+    networks:
+      - mlops_net
 
   preprocessing:
     image: samdataiken/preprocessing-service:dev
@@ -18,6 +22,8 @@ services:
       - ./config:/app/config
       - ./data/raw:/app/data/raw
       - ./data/processed:/app/data/processed
+    networks:
+      - mlops_net
 
   training:
     image: samdataiken/training-service:dev
@@ -30,6 +36,8 @@ services:
       - ./config:/app/config
       - ./data/processed:/app/data/processed
       - ./models:/app/models
+    networks:
+      - mlops_net
 
   evaluation:
     image: samdataiken/evaluation-service:dev
@@ -43,6 +51,8 @@ services:
       - ./data/processed:/app/data/processed
       - ./models:/app/models
       - ./evaluation:/app/evaluation
+    networks:
+      - mlops_net
 
   inference:
     image: samdataiken/inference-service:dev
@@ -56,6 +66,8 @@ services:
     volumes:
       - ./config:/app/config
       - ./data/processed:/app/data/processed
+    networks:
+      - mlops_net
 
   frontend:
     image: samdataiken/frontend-service:dev
@@ -68,6 +80,21 @@ services:
       - ./config:/app/config
       - ./src/frontend/static:/app/static
       - ./src/frontend/templates:/app/templates
+    networks:
+      - mlops_net
+
+  security_api:
+    build:
+      context: ./src/security
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./src/security:/app
+    networks:
+      - mlops_net
 
   postgres:
     image: postgres:13
@@ -78,6 +105,8 @@ services:
       POSTGRES_DB: airflow
     volumes:
       - postgres_db:/var/lib/postgresql/data
+    networks:
+      - mlops_net
 
   airflow-webserver:
     build:
@@ -100,6 +129,8 @@ services:
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
       - .:/opt/airflow/project
+    networks:
+      - mlops_net
     command: >
       bash -c "
       airflow db upgrade &&
@@ -123,6 +154,8 @@ services:
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
       - .:/opt/airflow/project
+    networks:
+      - mlops_net
     command: >
       bash -c "
       airflow db upgrade &&
@@ -131,3 +164,7 @@ services:
 
 volumes:
   postgres_db:
+
+networks:
+  mlops_net:
+    driver: bridge
