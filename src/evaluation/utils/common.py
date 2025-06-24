@@ -3,6 +3,7 @@ from pathlib import Path
 from box import ConfigBox
 import yaml
 import json
+from typing import List
 
 # Logger configuration
 logging.basicConfig(
@@ -37,7 +38,7 @@ def read_yaml(path_to_yaml: Path) -> ConfigBox:
         return ConfigBox(content)
 
 
-def create_directories(paths: list[Path]) -> None:
+def create_directories(paths: List[Path]) -> None:
     """
     Crée récursivement une liste de répertoires.
 

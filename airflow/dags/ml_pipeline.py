@@ -53,11 +53,26 @@ def run_training():
 
 
 def run_evaluation():
-    subprocess.run(
-        ["python", "-m", "evaluation.components.evaluate", "--config", CONFIG_PATH, "--params", PARAMS_PATH],
-        check=True,
-        cwd=BASE_SRC
-    )
+    try:
+        result = subprocess.run(
+            [
+                "python", "-m", "evaluation.components.evaluate",
+                "--config", CONFIG_PATH,
+                "--params", PARAMS_PATH
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+            cwd="/opt/airflow/project/src"
+        )
+        print("✅ Subprocess stdout:\n", result.stdout)
+        print("✅ Subprocess stderr:\n", result.stderr)
+    except subprocess.CalledProcessError as e:
+        print("❌ Subprocess failed!")
+        print("⚠️ STDOUT:\n", e.stdout)
+        print("⚠️ STDERR:\n", e.stderr)
+        raise
+
 
 # Paramètres du DAG
 default_args = {
