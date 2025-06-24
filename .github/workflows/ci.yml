@@ -36,7 +36,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r airflow/requirements.txt
-        pip install -r training/requirements.txt
+        pip install -r src/training/requirements.txt
 
     - name: Run DVC Pull
       run: |
