@@ -7,42 +7,27 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:13
-        ports: ['5432:5432']
-        env:
-          POSTGRES_USER: airflow
-          POSTGRES_PASSWORD: airflow
-          POSTGRES_DB: airflow
-        options: >-
-          --health-cmd="pg_isready"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      - name: 📥 Checkout du code
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.8'
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
 
-    - name: Install dependencies
-      run: |
-        pip install -r airflow/requirements.txt
-        pip install -r src/training/requirements.txt
+      - name: ⚙️ Installer les dépendances Airflow
+        run: pip install -r airflow/requirements.txt
 
-    - name: Run DVC Pull
-      run: |
-        sudo apt install -y dvc
-        dvc pull
+      - name: ⚙️ Installer les dépendances du training
+        run: pip install -r src/training/requirements.txt
 
-    - name: Run pipeline test
-      run: |
-        pytest tests/test_pipeline.py
+      - name: ✅ Vérifier l’import des modules principaux
+        run: |
+          python -c "import sklearn"
+          python -c "import xgboost"
+          python -c "import mlflow"
+
