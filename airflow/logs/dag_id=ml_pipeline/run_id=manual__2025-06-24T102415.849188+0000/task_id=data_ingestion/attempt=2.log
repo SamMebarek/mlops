@@ -1,0 +1,40 @@
+[2025-06-24T10:24:30.340+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ml_pipeline.data_ingestion manual__2025-06-24T10:24:15.849188+00:00 [queued]>
+[2025-06-24T10:24:30.353+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ml_pipeline.data_ingestion manual__2025-06-24T10:24:15.849188+00:00 [queued]>
+[2025-06-24T10:24:30.354+0000] {taskinstance.py:2170} INFO - Starting attempt 2 of 3
+[2025-06-24T10:24:30.377+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): data_ingestion> on 2025-06-24 10:24:15.849188+00:00
+[2025-06-24T10:24:30.383+0000] {standard_task_runner.py:60} INFO - Started process 306 to run task
+[2025-06-24T10:24:30.387+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'ml_pipeline', 'data_ingestion', 'manual__2025-06-24T10:24:15.849188+00:00', '--job-id', '8', '--raw', '--subdir', 'DAGS_FOLDER/ml_pipeline.py', '--cfg-path', '/tmp/tmppzrnr768']
+[2025-06-24T10:24:30.390+0000] {standard_task_runner.py:88} INFO - Job 8: Subtask data_ingestion
+[2025-06-24T10:24:30.454+0000] {task_command.py:423} INFO - Running <TaskInstance: ml_pipeline.data_ingestion manual__2025-06-24T10:24:15.849188+00:00 [running]> on host 3fe363fae776
+[2025-06-24T10:24:30.552+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='sarah' AIRFLOW_CTX_DAG_ID='ml_pipeline' AIRFLOW_CTX_TASK_ID='data_ingestion' AIRFLOW_CTX_EXECUTION_DATE='2025-06-24T10:24:15.849188+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-06-24T10:24:15.849188+00:00'
+[2025-06-24T10:24:41.516+0000] {local_task_job_runner.py:280} WARNING - Recorded pid 442 does not match the current pid 306
+[2025-06-24T10:24:41.530+0000] {process_utils.py:131} INFO - Sending 15 to group 306. PIDs of all processes in the group: [308, 306]
+[2025-06-24T10:24:41.540+0000] {process_utils.py:86} INFO - Sending the signal 15 to group 306
+[2025-06-24T10:24:41.543+0000] {taskinstance.py:2450} ERROR - Received SIGTERM. Terminating subprocesses.
+[2025-06-24T10:24:41.577+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=308, status='terminated', started='10:24:29') (308) terminated with exit code None
+[2025-06-24T10:24:41.602+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/ml_pipeline.py", line 19, in run_ingestion
+    subprocess.run(
+  File "/usr/local/lib/python3.8/subprocess.py", line 495, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+  File "/usr/local/lib/python3.8/subprocess.py", line 1020, in communicate
+    self.wait()
+  File "/usr/local/lib/python3.8/subprocess.py", line 1083, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/local/lib/python3.8/subprocess.py", line 1822, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/usr/local/lib/python3.8/subprocess.py", line 1780, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 2452, in signal_handler
+    raise AirflowException("Task received SIGTERM signal")
+airflow.exceptions.AirflowException: Task received SIGTERM signal
+[2025-06-24T10:24:41.643+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=ml_pipeline, task_id=data_ingestion, execution_date=20250624T102415, start_date=20250624T102439, end_date=20250624T102441
+[2025-06-24T10:24:41.704+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 8 for task data_ingestion (Task received SIGTERM signal; 306)
+[2025-06-24T10:24:41.751+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=306, status='terminated', exitcode=1, started='10:24:29') (306) terminated with exit code 1

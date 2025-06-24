@@ -1,0 +1,26 @@
+[2025-06-24T10:25:13.256+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ml_pipeline.model_evaluation manual__2025-06-24T10:24:20.242271+00:00 [queued]>
+[2025-06-24T10:25:13.269+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ml_pipeline.model_evaluation manual__2025-06-24T10:24:20.242271+00:00 [queued]>
+[2025-06-24T10:25:13.270+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-06-24T10:25:13.286+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): model_evaluation> on 2025-06-24 10:24:20.242271+00:00
+[2025-06-24T10:25:13.294+0000] {standard_task_runner.py:60} INFO - Started process 531 to run task
+[2025-06-24T10:25:13.300+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'ml_pipeline', 'model_evaluation', 'manual__2025-06-24T10:24:20.242271+00:00', '--job-id', '11', '--raw', '--subdir', 'DAGS_FOLDER/ml_pipeline.py', '--cfg-path', '/tmp/tmp_4ple47v']
+[2025-06-24T10:25:13.305+0000] {standard_task_runner.py:88} INFO - Job 11: Subtask model_evaluation
+[2025-06-24T10:25:13.368+0000] {task_command.py:423} INFO - Running <TaskInstance: ml_pipeline.model_evaluation manual__2025-06-24T10:24:20.242271+00:00 [running]> on host 3fe363fae776
+[2025-06-24T10:25:13.450+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='sarah' AIRFLOW_CTX_DAG_ID='ml_pipeline' AIRFLOW_CTX_TASK_ID='model_evaluation' AIRFLOW_CTX_EXECUTION_DATE='2025-06-24T10:24:20.242271+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-06-24T10:24:20.242271+00:00'
+[2025-06-24T10:25:15.346+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/ml_pipeline.py", line 56, in run_evaluation
+    subprocess.run(
+  File "/usr/local/lib/python3.8/subprocess.py", line 516, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['python', '-m', 'evaluation.components.evaluate', '--config', '/opt/airflow/project/config/config.yaml', '--params', '/opt/airflow/project/config/params.yaml']' returned non-zero exit status 1.
+[2025-06-24T10:25:15.363+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=ml_pipeline, task_id=model_evaluation, execution_date=20250624T102420, start_date=20250624T102513, end_date=20250624T102515
+[2025-06-24T10:25:15.375+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 11 for task model_evaluation (Command '['python', '-m', 'evaluation.components.evaluate', '--config', '/opt/airflow/project/config/config.yaml', '--params', '/opt/airflow/project/config/params.yaml']' returned non-zero exit status 1.; 531)
+[2025-06-24T10:25:15.401+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-06-24T10:25:15.420+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

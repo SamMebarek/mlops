@@ -1,0 +1,52 @@
+[2025-06-24T10:24:27.357+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ml_pipeline.model_training manual__2025-06-24T10:24:15.849188+00:00 [queued]>
+[2025-06-24T10:24:27.368+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ml_pipeline.model_training manual__2025-06-24T10:24:15.849188+00:00 [queued]>
+[2025-06-24T10:24:27.369+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-06-24T10:24:27.390+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): model_training> on 2025-06-24 10:24:15.849188+00:00
+[2025-06-24T10:24:27.397+0000] {standard_task_runner.py:60} INFO - Started process 278 to run task
+[2025-06-24T10:24:27.401+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'ml_pipeline', 'model_training', 'manual__2025-06-24T10:24:15.849188+00:00', '--job-id', '7', '--raw', '--subdir', 'DAGS_FOLDER/ml_pipeline.py', '--cfg-path', '/tmp/tmpi_fo1fsl']
+[2025-06-24T10:24:27.403+0000] {standard_task_runner.py:88} INFO - Job 7: Subtask model_training
+[2025-06-24T10:24:27.459+0000] {task_command.py:423} INFO - Running <TaskInstance: ml_pipeline.model_training manual__2025-06-24T10:24:15.849188+00:00 [running]> on host 3fe363fae776
+[2025-06-24T10:24:27.553+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='sarah' AIRFLOW_CTX_DAG_ID='ml_pipeline' AIRFLOW_CTX_TASK_ID='model_training' AIRFLOW_CTX_EXECUTION_DATE='2025-06-24T10:24:15.849188+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-06-24T10:24:15.849188+00:00'
+[2025-06-24T10:24:37.767+0000] {local_task_job_runner.py:302} WARNING - State of this instance has been externally set to None. Terminating instance.
+[2025-06-24T10:24:37.796+0000] {process_utils.py:131} INFO - Sending 15 to group 278. PIDs of all processes in the group: [279, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 278]
+[2025-06-24T10:24:37.800+0000] {process_utils.py:86} INFO - Sending the signal 15 to group 278
+[2025-06-24T10:24:37.825+0000] {taskinstance.py:2450} ERROR - Received SIGTERM. Terminating subprocesses.
+[2025-06-24T10:24:37.877+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=359, status='terminated', started='10:24:32') (359) terminated with exit code None
+[2025-06-24T10:24:37.880+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=279, status='terminated', started='10:24:26') (279) terminated with exit code None
+[2025-06-24T10:24:37.881+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=355, status='terminated', started='10:24:32') (355) terminated with exit code None
+[2025-06-24T10:24:37.883+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=350, status='terminated', started='10:24:32') (350) terminated with exit code None
+[2025-06-24T10:24:37.887+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=351, status='terminated', started='10:24:32') (351) terminated with exit code None
+[2025-06-24T10:24:37.888+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=357, status='terminated', started='10:24:32') (357) terminated with exit code None
+[2025-06-24T10:24:37.889+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=352, status='terminated', started='10:24:32') (352) terminated with exit code None
+[2025-06-24T10:24:37.891+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=358, status='terminated', started='10:24:32') (358) terminated with exit code None
+[2025-06-24T10:24:37.892+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=353, status='terminated', started='10:24:32') (353) terminated with exit code None
+[2025-06-24T10:24:37.917+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/ml_pipeline.py", line 34, in run_training
+    result = subprocess.run(
+  File "/usr/local/lib/python3.8/subprocess.py", line 495, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+  File "/usr/local/lib/python3.8/subprocess.py", line 1028, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+  File "/usr/local/lib/python3.8/subprocess.py", line 1884, in _communicate
+    ready = selector.select(timeout)
+  File "/usr/local/lib/python3.8/selectors.py", line 415, in select
+    fd_event_list = self._selector.poll(timeout)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 2452, in signal_handler
+    raise AirflowException("Task received SIGTERM signal")
+airflow.exceptions.AirflowException: Task received SIGTERM signal
+[2025-06-24T10:24:37.974+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=ml_pipeline, task_id=model_training, execution_date=20250624T102415, start_date=20250624T102427, end_date=20250624T102437
+[2025-06-24T10:24:38.031+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 7 for task model_training (Task received SIGTERM signal; 278)
+[2025-06-24T10:24:38.085+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=278, status='terminated', exitcode=1, started='10:24:26') (278) terminated with exit code 1
+[2025-06-24T10:24:38.087+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=354, status='terminated', started='10:24:32') (354) terminated with exit code None
+[2025-06-24T10:24:38.090+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=349, status='terminated', started='10:24:32') (349) terminated with exit code None
+[2025-06-24T10:24:38.092+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=360, status='terminated', started='10:24:32') (360) terminated with exit code None
+[2025-06-24T10:24:38.102+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=361, status='terminated', started='10:24:32') (361) terminated with exit code None
+[2025-06-24T10:24:38.106+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=356, status='terminated', started='10:24:32') (356) terminated with exit code None
+[2025-06-24T10:24:38.108+0000] {process_utils.py:79} INFO - Process psutil.Process(pid=348, status='terminated', started='10:24:32') (348) terminated with exit code None

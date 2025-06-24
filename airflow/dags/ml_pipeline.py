@@ -5,41 +5,59 @@ import subprocess
 import os
 import sys
 
-# Ajouter le chemin vers le dossier src pour les imports dans le DAG (pas utile dans subprocess)
-sys.path.append("/opt/airflow/project/src")
-
-# Chemins vers les fichiers de configuration
+# Chemins vers les fichiers de configuration et base source
 CONFIG_PATH = "/opt/airflow/project/config/config.yaml"
 PARAMS_PATH = "/opt/airflow/project/config/params.yaml"
+BASE_SRC = "/opt/airflow/project/src"
 
-# Fonctions appelées dans les tâches Airflow
+# Ajouter le dossier src au PYTHONPATH si besoin pour les imports internes
+sys.path.append(BASE_SRC)
+
+# Tâches du pipeline
+
 def run_ingestion():
-    subprocess.run([
-        "python", "-m", "ingestion.components.data_ingestion",
-        "--config", CONFIG_PATH,
-        "--params", PARAMS_PATH
-    ], check=True, cwd="/opt/airflow/project/src")
+    subprocess.run(
+        ["python", "-m", "ingestion.components.data_ingestion", "--config", CONFIG_PATH, "--params", PARAMS_PATH],
+        check=True,
+        cwd=BASE_SRC
+    )
 
 def run_preprocessing():
-    subprocess.run([
-        "python", "-m", "preprocessing.components.preprocess",
-        "--config", CONFIG_PATH,
-        "--params", PARAMS_PATH
-    ], check=True, cwd="/opt/airflow/project/src")
+    subprocess.run(
+        ["python", "-m", "preprocessing.components.preprocess", "--config", CONFIG_PATH, "--params", PARAMS_PATH],
+        check=True,
+        cwd=BASE_SRC
+    )
 
 def run_training():
-    subprocess.run([
-        "python", "-m", "training.components.train",
-        "--config", CONFIG_PATH,
-        "--params", PARAMS_PATH
-    ], check=True, cwd="/opt/airflow/project/src")
+    try:
+        result = subprocess.run(
+            [
+                "python", "-m", "training.components.train",
+                "--config", CONFIG_PATH,
+                "--params", PARAMS_PATH
+            ],
+            cwd="/opt/airflow/project/src",  # très important
+            env={**os.environ, "PYTHONPATH": "/opt/airflow/project/src"},  # obligatoire pour les imports locaux
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        print("✅ Subprocess stdout:\n", result.stdout)
+        print("✅ Subprocess stderr:\n", result.stderr)
+    except subprocess.CalledProcessError as e:
+        print("❌ Subprocess failed!")
+        print("⚠️ STDOUT:\n", e.stdout)
+        print("⚠️ STDERR:\n", e.stderr)
+        raise
+
 
 def run_evaluation():
-    subprocess.run([
-        "python", "-m", "evaluation.components.evaluate",
-        "--config", CONFIG_PATH,
-        "--params", PARAMS_PATH
-    ], check=True, cwd="/opt/airflow/project/src")
+    subprocess.run(
+        ["python", "-m", "evaluation.components.evaluate", "--config", CONFIG_PATH, "--params", PARAMS_PATH],
+        check=True,
+        cwd=BASE_SRC
+    )
 
 # Paramètres du DAG
 default_args = {
@@ -78,4 +96,5 @@ with DAG(
         python_callable=run_evaluation
     )
 
+    # Orchestration des tâches
     task_ingest >> task_preprocess >> task_train >> task_evaluate

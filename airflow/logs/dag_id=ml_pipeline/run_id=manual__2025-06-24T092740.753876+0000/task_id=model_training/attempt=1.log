@@ -1,0 +1,38 @@
+[2025-06-24T09:28:00.985+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ml_pipeline.model_training manual__2025-06-24T09:27:40.753876+00:00 [queued]>
+[2025-06-24T09:28:00.997+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ml_pipeline.model_training manual__2025-06-24T09:27:40.753876+00:00 [queued]>
+[2025-06-24T09:28:00.998+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-06-24T09:28:01.020+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): model_training> on 2025-06-24 09:27:40.753876+00:00
+[2025-06-24T09:28:01.030+0000] {standard_task_runner.py:60} INFO - Started process 224 to run task
+[2025-06-24T09:28:01.035+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'ml_pipeline', 'model_training', 'manual__2025-06-24T09:27:40.753876+00:00', '--job-id', '35', '--raw', '--subdir', 'DAGS_FOLDER/ml_pipeline.py', '--cfg-path', '/tmp/tmpf2tgiuus']
+[2025-06-24T09:28:01.043+0000] {standard_task_runner.py:88} INFO - Job 35: Subtask model_training
+[2025-06-24T09:28:01.192+0000] {task_command.py:423} INFO - Running <TaskInstance: ml_pipeline.model_training manual__2025-06-24T09:27:40.753876+00:00 [running]> on host ff2cc541059c
+[2025-06-24T09:28:01.305+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='sarah' AIRFLOW_CTX_DAG_ID='ml_pipeline' AIRFLOW_CTX_TASK_ID='model_training' AIRFLOW_CTX_EXECUTION_DATE='2025-06-24T09:27:40.753876+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-06-24T09:27:40.753876+00:00'
+[2025-06-24T09:28:02.625+0000] {logging_mixin.py:188} INFO - ❌ Subprocess failed!
+[2025-06-24T09:28:02.628+0000] {logging_mixin.py:188} INFO - ⚠️ STDOUT:
+[2025-06-24T09:28:02.630+0000] {logging_mixin.py:188} INFO -  
+[2025-06-24T09:28:02.632+0000] {logging_mixin.py:188} INFO - ⚠️ STDERR:
+[2025-06-24T09:28:02.633+0000] {logging_mixin.py:188} INFO -  Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/runpy.py", line 194, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/local/lib/python3.8/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/opt/***/project/src/training/components/train.py", line 6, in <module>
+    from sklearn.model_selection import train_test_split, RandomizedSearchCV
+ModuleNotFoundError: No module named 'sklearn'
+[2025-06-24T09:28:02.636+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/ml_pipeline.py", line 34, in run_training
+    result = subprocess.run(
+  File "/usr/local/lib/python3.8/subprocess.py", line 516, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['python', '-m', 'training.components.train', '--config', '/opt/airflow/project/config/config.yaml', '--params', '/opt/airflow/project/config/params.yaml']' returned non-zero exit status 1.
+[2025-06-24T09:28:02.667+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=ml_pipeline, task_id=model_training, execution_date=20250624T092740, start_date=20250624T092800, end_date=20250624T092802
+[2025-06-24T09:28:02.700+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 35 for task model_training (Command '['python', '-m', 'training.components.train', '--config', '/opt/airflow/project/config/config.yaml', '--params', '/opt/airflow/project/config/params.yaml']' returned non-zero exit status 1.; 224)
+[2025-06-24T09:28:02.746+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-06-24T09:28:02.830+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

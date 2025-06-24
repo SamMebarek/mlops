@@ -1,9 +1,14 @@
 FROM apache/airflow:2.8.1
 
-USER airflow
+USER root
+# Copie le fichier dans un répertoire accessible
 COPY airflow/requirements.txt /requirements.txt
+
+# Change temporairement les droits pour l'utilisateur airflow
+RUN chown airflow: /requirements.txt
+
+# Revenir à l'utilisateur airflow pour l'installation
+USER airflow
+
+# Installer les dépendances dans le bon environnement
 RUN pip install --no-cache-dir -r /requirements.txt
-
-COPY training/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
