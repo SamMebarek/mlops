@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: security-api
+  namespace: mlops-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: security-api
+  template:
+    metadata:
+      labels:
+        app: security-api
+    spec:
+      containers:
+        - name: security-api
+          image: samdataiken/security-api:dev
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: project-env
+          volumeMounts:
+            - name: security-code
+              mountPath: /app
+      volumes:
+        - name: security-code
+          hostPath:
+            path: /full/path/to/src/security  # change ce chemin
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: security-api-service
+  namespace: mlops-demo
+spec:
+  selector:
+    app: security-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: ClusterIP

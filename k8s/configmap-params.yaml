@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inference-params
+  namespace: mlops-demo
+data:
+  params.yaml: |
+    ingestion:
+      input: "data/ingestion/donnees_synthetiques.csv"
+      output: "data/raw/ingested_data.csv"
+
+    preprocessing:
+      drop_na: true
+      columns_to_keep:
+        - SKU
+        - Prix
+        - Timestamp
+        - AgeProduitEnJours
+        - QuantiteVendue
+        - UtiliteProduit
+        - ElasticitePrix
+        - Remise
+        - Qualite
+        - Mois_sin
+        - Mois_cos
+        - Heure_sin
+        - Heure_cos
+
+    training:
+      epochs: 20
+      batch_size: 64
+      learning_rate: 0.01
+      test_size: 0.2
+      random_seed: 17
+
+      param_dist:
+        n_estimators_min: 50
+        n_estimators_max: 200
+        learning_rate_min: 0.01
+        learning_rate_max: 0.2
+        max_depth_min: 3
+        max_depth_max: 7
+        subsample_min: 0.6
+        subsample_max: 1.0
+        colsample_bytree_min: 0.6
+        colsample_bytree_max: 1.0
+        gamma_min: 0
+        gamma_max: 0.3
