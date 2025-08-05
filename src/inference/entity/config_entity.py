@@ -1,3 +1,5 @@
+# src/inference/entity/config_entity.py
+
 from dataclasses import dataclass
 from pathlib import Path
 

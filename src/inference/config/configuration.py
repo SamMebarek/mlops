@@ -1,3 +1,5 @@
+# src/inference/config/configuration.py
+
 import os
 from pathlib import Path
 from box import ConfigBox

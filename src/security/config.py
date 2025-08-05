@@ -1,3 +1,5 @@
+# src/security/config.py
+
 import os
 from pydantic import BaseSettings
 

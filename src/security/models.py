@@ -1,3 +1,5 @@
+# src/security/models.py
+
 from pydantic import BaseModel
 
 class LoginRequest(BaseModel):
