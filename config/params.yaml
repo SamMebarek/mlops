@@ -7,6 +7,7 @@ preprocessing:
   drop_na: true
   columns_to_keep:
     - SKU
+    - PrixInitial
     - Prix
     - Timestamp
     - AgeProduitEnJours

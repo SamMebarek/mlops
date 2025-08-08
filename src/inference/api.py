@@ -1,10 +1,8 @@
-#  src/inference/api.py
+# src/inference/api.py
 
-from fastapi import FastAPI, Depends, HTTPException, status, Request
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi import FastAPI, HTTPException, status, Request
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
-import requests
 
 from inference.config.configuration import ConfigurationManager
 from inference.repository.data_repository import CsvDataRepository, DvcDataRepository
@@ -15,31 +13,6 @@ from inference.service.prediction_service import (
     InsufficientDataError,
 )
 from inference.entity.dto import PredictionResult
-
-# --- Security setup ---
-security = HTTPBasic()
-SECURITY_API_URL = "http://security_api:8000/verify-token"
-
-def get_current_admin(
-    credentials: HTTPBasicCredentials = Depends(security), request: Request = None
-) -> str:
-    cfg = request.app.state.cfg
-    if credentials.username != cfg.admin_user or credentials.password != cfg.admin_password:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return credentials.username
-
-def verify_token_with_security_api(token: str):
-    try:
-        response = requests.post(SECURITY_API_URL, json={"token": token})
-        if response.status_code != 200:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        return response.json()["payload"]
-    except requests.exceptions.RequestException:
-        raise HTTPException(status_code=500, detail="Token verification service unavailable")
 
 # --- App initialization ---
 app = FastAPI()
@@ -80,15 +53,12 @@ def health(request: Request) -> JSONResponse:
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict(req: PredictionRequest, request: Request):
-    # 🔐 Vérification du token dans l'en-tête Authorization
+    # Ensure Authorization header present
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+    # No JWT decode: trust the gateway
 
-    token = auth_header.split(" ")[1]
-    verify_token_with_security_api(token)
-
-    # ✅ Prédiction si token valide
     service: PredictionService = request.app.state.service
     try:
         result: PredictionResult = service.predict(req.sku)
@@ -104,8 +74,14 @@ def predict(req: PredictionRequest, request: Request):
     except Exception as e:
         raise HTTPException(status_code=500, detail="Prediction error: " + str(e))
 
-@app.post("/reload-model", dependencies=[Depends(get_current_admin)])
+@app.post("/reload-model")
 def reload_model(request: Request):
+    # Ensure Authorization header present
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+    # No JWT decode: trust the gateway
+
     service: PredictionService = request.app.state.service
     try:
         new_model = service.model_repo.load()
@@ -114,7 +90,6 @@ def reload_model(request: Request):
     except Exception as e:
         raise HTTPException(status_code=500, detail="Reload failed: " + str(e))
 
-# --- Entrée directe (rarement utilisé car FastAPI est lancé via uvicorn en ligne de commande) ---
 if __name__ == "__main__":
     cfg = app.state.cfg
     import uvicorn

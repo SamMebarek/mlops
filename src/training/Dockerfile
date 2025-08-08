@@ -2,7 +2,7 @@
 # Emplacement : src/training/Dockerfile
 
 # 1. Image de base légère Python 3.13.2-slim
-FROM python:3.13.2-slim
+FROM python:3.12-slim
 
 # 2. Répertoire de travail dans le conteneur
 WORKDIR /app

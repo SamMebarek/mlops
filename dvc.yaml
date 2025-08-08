@@ -1,5 +1,5 @@
 # dvc.yaml
-# dvc.yaml (au format DVC 3.x, sans erreur de "extra keys" ni de double "src/")
+# dvc.yaml (au format DVC 3.x)
 
 stages:
   data_ingestion:

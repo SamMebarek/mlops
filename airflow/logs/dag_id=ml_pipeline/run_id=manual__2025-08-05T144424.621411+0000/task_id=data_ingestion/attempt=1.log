@@ -1,0 +1,13 @@
+[2025-08-05T14:44:26.168+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ml_pipeline.data_ingestion manual__2025-08-05T14:44:24.621411+00:00 [queued]>
+[2025-08-05T14:44:26.199+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ml_pipeline.data_ingestion manual__2025-08-05T14:44:24.621411+00:00 [queued]>
+[2025-08-05T14:44:26.201+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-08-05T14:44:26.231+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): data_ingestion> on 2025-08-05 14:44:24.621411+00:00
+[2025-08-05T14:44:26.237+0000] {standard_task_runner.py:60} INFO - Started process 208 to run task
+[2025-08-05T14:44:26.242+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'ml_pipeline', 'data_ingestion', 'manual__2025-08-05T14:44:24.621411+00:00', '--job-id', '10', '--raw', '--subdir', 'DAGS_FOLDER/ml_pipeline.py', '--cfg-path', '/tmp/tmpki7my72l']
+[2025-08-05T14:44:26.247+0000] {standard_task_runner.py:88} INFO - Job 10: Subtask data_ingestion
+[2025-08-05T14:44:26.352+0000] {task_command.py:423} INFO - Running <TaskInstance: ml_pipeline.data_ingestion manual__2025-08-05T14:44:24.621411+00:00 [running]> on host f0f20e28ca3c
+[2025-08-05T14:44:26.485+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='sarah' AIRFLOW_CTX_DAG_ID='ml_pipeline' AIRFLOW_CTX_TASK_ID='data_ingestion' AIRFLOW_CTX_EXECUTION_DATE='2025-08-05T14:44:24.621411+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-08-05T14:44:24.621411+00:00'
+[2025-08-05T14:44:32.128+0000] {python.py:201} INFO - Done. Returned value was: None
+[2025-08-05T14:44:32.141+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=ml_pipeline, task_id=data_ingestion, execution_date=20250805T144424, start_date=20250805T144426, end_date=20250805T144432
+[2025-08-05T14:44:32.205+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2025-08-05T14:44:32.265+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check
