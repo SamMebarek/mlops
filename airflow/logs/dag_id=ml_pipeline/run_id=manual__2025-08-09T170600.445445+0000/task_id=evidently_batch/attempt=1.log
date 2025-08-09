@@ -1,0 +1,20 @@
+[2025-08-09T17:12:41.812+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ml_pipeline.evidently_batch manual__2025-08-09T17:06:00.445445+00:00 [queued]>
+[2025-08-09T17:12:41.841+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ml_pipeline.evidently_batch manual__2025-08-09T17:06:00.445445+00:00 [queued]>
+[2025-08-09T17:12:41.842+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-08-09T17:12:41.870+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): evidently_batch> on 2025-08-09 17:06:00.445445+00:00
+[2025-08-09T17:12:41.882+0000] {standard_task_runner.py:60} INFO - Started process 1925 to run task
+[2025-08-09T17:12:41.890+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'ml_pipeline', 'evidently_batch', 'manual__2025-08-09T17:06:00.445445+00:00', '--job-id', '66', '--raw', '--subdir', 'DAGS_FOLDER/ml_pipeline.py', '--cfg-path', '/tmp/tmp1hjy47vz']
+[2025-08-09T17:12:41.893+0000] {standard_task_runner.py:88} INFO - Job 66: Subtask evidently_batch
+[2025-08-09T17:12:42.044+0000] {task_command.py:423} INFO - Running <TaskInstance: ml_pipeline.evidently_batch manual__2025-08-09T17:06:00.445445+00:00 [running]> on host 1a0a448a8cb5
+[2025-08-09T17:12:42.278+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='sarah' AIRFLOW_CTX_DAG_ID='ml_pipeline' AIRFLOW_CTX_TASK_ID='evidently_batch' AIRFLOW_CTX_EXECUTION_DATE='2025-08-09T17:06:00.445445+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-08-09T17:06:00.445445+00:00'
+[2025-08-09T17:13:02.116+0000] {logging_mixin.py:188} INFO - STDOUT:
+[2025-08-09T17:13:02.116+0000] {logging_mixin.py:188} INFO -  
+[2025-08-09T17:13:02.117+0000] {logging_mixin.py:188} INFO - STDERR:
+[2025-08-09T17:13:02.117+0000] {logging_mixin.py:188} INFO -  2025-08-09 17:12:49,158 - INFO - Loading reference: /opt/***/project/data/reference/clean_data_ref.csv
+2025-08-09 17:12:49,159 - INFO - Loading current:   /opt/***/project/data/processed/clean_data.csv
+2025-08-09 17:13:01,469 - INFO - Pushed to http://pushgateway:9091: {'evidently_drift_share': 0.0, 'evidently_features_drifted_total': 0.0, 'evidently_data_drift': 0.0, 'evidently_current_rows_total': 0.0, 'evidently_missing_values_total': 0.0, 'evidently_run_duration_seconds': 12.303602400999807}
+2025-08-09 17:13:01,486 - INFO - Done. Metrics: {'evidently_drift_share': 0.0, 'evidently_features_drifted_total': 0.0, 'evidently_data_drift': 0.0, 'evidently_current_rows_total': 0.0, 'evidently_missing_values_total': 0.0, 'evidently_run_duration_seconds': 12.303602400999807}
+[2025-08-09T17:13:02.118+0000] {python.py:201} INFO - Done. Returned value was: None
+[2025-08-09T17:13:02.130+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=ml_pipeline, task_id=evidently_batch, execution_date=20250809T170600, start_date=20250809T171241, end_date=20250809T171302
+[2025-08-09T17:13:02.155+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2025-08-09T17:13:02.180+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check
