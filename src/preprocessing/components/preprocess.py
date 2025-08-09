@@ -1,12 +1,18 @@
-#  src/preprocessing/components/preprocess.py
+# src/preprocessing/components/preprocess.py
 
 import argparse
 import logging
+import time
+import os
+
 import numpy as np
 import pandas as pd
 
 from preprocessing.config.configuration import ConfigurationManager
 from preprocessing.repository.repository import CsvPreprocessingRepository
+
+# Prometheus (minimal push)
+from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 
 # Logger
 logging.basicConfig(
@@ -14,6 +20,10 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+# Pushgateway URL (Compose service name works on the Docker network)
+PUSHGATEWAY_URL = os.getenv("PUSHGATEWAY_URL", "http://pushgateway:9091")
+PUSH_GROUPING = {"instance": os.getenv("INSTANCE", "local"), "service": "preprocessing"}
 
 
 def convert_types(df: pd.DataFrame) -> pd.DataFrame:
@@ -48,7 +58,6 @@ def add_time_features(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def drop_unused_columns(df: pd.DataFrame) -> pd.DataFrame:
-    # Ici, on supprime uniquement les colonnes explicitement inutiles
     to_drop = [
         "DateLancement",
         "PrixPlancher",
@@ -56,37 +65,76 @@ def drop_unused_columns(df: pd.DataFrame) -> pd.DataFrame:
         "ErreurAleatoire",
         "Categorie",
         "Promotion",
-        # autres colonnes à retirer si nécessaire...
     ]
     existing = [c for c in to_drop if c in df.columns]
     return df.drop(columns=existing, errors="ignore")
 
 
+def _push_metrics(status: int, duration_s: float, rows: int) -> None:
+    """Push a few gauges to Pushgateway; never raise."""
+    try:
+        reg = CollectorRegistry()
+        g_status = Gauge("job_status", "1=success,0=failure", registry=reg)
+        g_dur = Gauge("job_duration_seconds", "Job wall time in seconds", registry=reg)
+        g_rows = Gauge("rows_processed_total", "Rows processed by the job", registry=reg)
+
+        g_status.set(float(status))
+        g_dur.set(float(duration_s))
+        g_rows.set(float(rows))
+
+        push_to_gateway(
+            PUSHGATEWAY_URL,
+            job="preprocessing",
+            grouping_key=PUSH_GROUPING,
+            registry=reg,
+        )
+        logger.info(
+            f"Pushed metrics to Pushgateway ({PUSHGATEWAY_URL}) "
+            f"status={status} duration_s={duration_s:.3f} rows={rows}"
+        )
+    except Exception as e:
+        logger.warning(f"Failed to push metrics to Pushgateway: {e}")
+
+
 def run_preprocessing(config_path: str, params_path: str):
-    # 1) Chargement des configs et params
-    cm = ConfigurationManager(config_path, params_path)
-    cfg = cm.get_preprocessing_config()
-    params = cm.get_params()
+    t0 = time.perf_counter()
+    rows_out = 0
+    status = 0  # pessimistic default
 
-    # 2) Lecture des données brutes
-    df = pd.read_csv(cfg.raw_data_path, encoding="utf-8")
-    logger.info(f"Charged raw data: {cfg.raw_data_path} (shape={df.shape})")
+    try:
+        # 1) Chargement des configs et params
+        cm = ConfigurationManager(config_path, params_path)
+        cfg = cm.get_preprocessing_config()
+        params = cm.get_params()
 
-    # 3) Transformations séquentielles
-    df = convert_types(df)
-    df = add_time_features(df)
-    df = drop_unused_columns(df)
+        # 2) Lecture des données brutes
+        df = pd.read_csv(cfg.raw_data_path, encoding="utf-8")
+        logger.info(f"Charged raw data: {cfg.raw_data_path} (shape={df.shape})")
 
-    # 4) Sélection des colonnes finales
-    keep = params.columns_to_keep
-    df_clean = df[keep].copy()
-    logger.info(f"Columns kept: {keep}")
+        # 3) Transformations séquentielles
+        df = convert_types(df)
+        df = add_time_features(df)
+        df = drop_unused_columns(df)
 
-    # 5) Persistance via repository
-    target = cfg.processed_dir / cfg.clean_file_name
-    repo = CsvPreprocessingRepository(target)
-    repo.save(df_clean)
-    logger.info(f"Saved cleaned data to: {target}")
+        # 4) Sélection des colonnes finales
+        keep = params.columns_to_keep
+        df_clean = df[keep].copy()
+        rows_out = len(df_clean)
+        logger.info(f"Columns kept: {keep} (rows={rows_out})")
+
+        # 5) Persistance via repository
+        target = cfg.processed_dir / cfg.clean_file_name
+        repo = CsvPreprocessingRepository(target)
+        repo.save(df_clean)
+        logger.info(f"Saved cleaned data to: {target}")
+
+        status = 1  # success
+    except Exception as e:
+        logger.exception(f"Preprocessing failed: {e}")
+        raise
+    finally:
+        duration = time.perf_counter() - t0
+        _push_metrics(status=status, duration_s=duration, rows=rows_out)
 
 
 if __name__ == "__main__":

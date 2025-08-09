@@ -1,0 +1,79 @@
+[2025-08-09T10:51:14.641+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ml_pipeline.model_training manual__2025-08-09T10:45:29.507599+00:00 [queued]>
+[2025-08-09T10:51:14.660+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ml_pipeline.model_training manual__2025-08-09T10:45:29.507599+00:00 [queued]>
+[2025-08-09T10:51:14.661+0000] {taskinstance.py:2170} INFO - Starting attempt 2 of 2
+[2025-08-09T10:51:14.685+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): model_training> on 2025-08-09 10:45:29.507599+00:00
+[2025-08-09T10:51:14.695+0000] {standard_task_runner.py:60} INFO - Started process 337 to run task
+[2025-08-09T10:51:14.704+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'ml_pipeline', 'model_training', 'manual__2025-08-09T10:45:29.507599+00:00', '--job-id', '42', '--raw', '--subdir', 'DAGS_FOLDER/ml_pipeline.py', '--cfg-path', '/tmp/tmpewfahehq']
+[2025-08-09T10:51:14.710+0000] {standard_task_runner.py:88} INFO - Job 42: Subtask model_training
+[2025-08-09T10:51:14.806+0000] {task_command.py:423} INFO - Running <TaskInstance: ml_pipeline.model_training manual__2025-08-09T10:45:29.507599+00:00 [running]> on host 517feef57f93
+[2025-08-09T10:51:14.907+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='sarah' AIRFLOW_CTX_DAG_ID='ml_pipeline' AIRFLOW_CTX_TASK_ID='model_training' AIRFLOW_CTX_EXECUTION_DATE='2025-08-09T10:45:29.507599+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-08-09T10:45:29.507599+00:00'
+[2025-08-09T10:51:32.350+0000] {logging_mixin.py:188} INFO - STDOUT:
+[2025-08-09T10:51:32.351+0000] {logging_mixin.py:188} INFO -  Fitting 3 folds for each of 10 candidates, totalling 30 fits
+🏃 View run XGBoost_RandSearch at: https://dagshub.com/SamMebarek/mlops-som.mlflow/#/experiments/0/runs/98a06da4b55f439d925934d920c93efa
+🧪 View experiment at: https://dagshub.com/SamMebarek/mlops-som.mlflow/#/experiments/0
+[2025-08-09T10:51:32.351+0000] {logging_mixin.py:188} INFO - STDERR:
+[2025-08-09T10:51:32.352+0000] {logging_mixin.py:188} INFO -  2025-08-09 10:51:18,077 - training.utils.common - INFO - YAML chargé : /opt/***/project/config/config.yaml
+2025-08-09 10:51:18,087 - training.utils.common - INFO - YAML chargé : /opt/***/project/config/params.yaml
+2025-08-09 10:51:18,088 - training.utils.common - INFO - Répertoire créé ou existant : /opt/***/project/models
+2025-08-09 10:51:18,089 - training.utils.common - INFO - Répertoire créé ou existant : /opt/***/project/models
+2025-08-09 10:51:18,869 - __main__ - INFO - Loaded processed data: /opt/***/project/data/processed/clean_data.csv (shape=(108060, 14))
+2025-08-09 10:51:18,898 - __main__ - INFO - Split data: train_shape=(86448, 11), test_shape=(21612, 11)
+2025/08/09 10:51:18 WARNING mlflow.utils.git_utils: Failed to import Git (the Git executable is probably not on your PATH), so Git SHA is not available. Error: Failed to initialize: Bad git executable.
+The git executable must be specified in one of the following ways:
+    - be included in your $PATH
+    - be set via $GIT_PYTHON_GIT_EXECUTABLE
+    - explicitly set via git.refresh(<full-path-to-git-executable>)
+
+All git commands will error until this is rectified.
+
+This initial message can be silenced or aggravated in the future by setting the
+$GIT_PYTHON_REFRESH environment variable. Use one of the following values:
+    - quiet|q|silence|s|silent|none|n|0: for no message or exception
+    - warn|w|warning|log|l|1: for a warning message (logging level CRITICAL, displayed by default)
+    - error|e|exception|raise|r|2: for a raised exception
+
+Example:
+    export GIT_PYTHON_REFRESH=quiet
+
+2025-08-09 10:51:19,205 - __main__ - INFO - Starting hyperparameter search and training.
+2025-08-09 10:51:29,466 - __main__ - INFO - Best params: {'colsample_bytree': 0.9219644132807024, 'gamma': 0.06692515264078093, 'learning_rate': 0.19307895078298942, 'max_depth': 5, 'n_estimators': 86, 'subsample': 0.6271914913054505}
+2025-08-09 10:51:29,466 - __main__ - INFO - R^2 score: 0.9998
+2025-08-09 10:51:31,511 - __main__ - ERROR - Training failed: Path 'xgb_model_dir' already exists and is not empty
+Traceback (most recent call last):
+  File "/opt/***/project/src/training/components/train.py", line 144, in run_training
+    mlflow.sklearn.save_model(
+  File "/home/***/.local/lib/python3.10/site-packages/mlflow/sklearn/__init__.py", line 245, in save_model
+    _validate_and_prepare_target_save_path(path)
+  File "/home/***/.local/lib/python3.10/site-packages/mlflow/utils/model_utils.py", line 271, in _validate_and_prepare_target_save_path
+    raise MlflowException(
+mlflow.exceptions.MlflowException: Path 'xgb_model_dir' already exists and is not empty
+2025-08-09 10:51:31,522 - __main__ - INFO - Pushed metrics to Pushgateway (http://pushgateway:9091) status=0 duration_s=13.462 rows=108060 r2=0.9997696380635521 artifact_bytes=0
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/local/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/opt/***/project/src/training/components/train.py", line 196, in <module>
+    run_training(args.config, args.params)
+  File "/opt/***/project/src/training/components/train.py", line 144, in run_training
+    mlflow.sklearn.save_model(
+  File "/home/***/.local/lib/python3.10/site-packages/mlflow/sklearn/__init__.py", line 245, in save_model
+    _validate_and_prepare_target_save_path(path)
+  File "/home/***/.local/lib/python3.10/site-packages/mlflow/utils/model_utils.py", line 271, in _validate_and_prepare_target_save_path
+    raise MlflowException(
+mlflow.exceptions.MlflowException: Path 'xgb_model_dir' already exists and is not empty
+[2025-08-09T10:51:32.353+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.10/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.10/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.10/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/ml_pipeline.py", line 62, in run_training
+    raise subprocess.CalledProcessError(res.returncode, res.args, res.stdout, res.stderr)
+subprocess.CalledProcessError: Command '['/usr/local/bin/python', '-m', 'training.components.train', '--config', '/opt/airflow/project/config/config.yaml', '--params', '/opt/airflow/project/config/params.yaml']' returned non-zero exit status 1.
+[2025-08-09T10:51:32.369+0000] {taskinstance.py:1138} INFO - Marking task as FAILED. dag_id=ml_pipeline, task_id=model_training, execution_date=20250809T104529, start_date=20250809T105114, end_date=20250809T105132
+[2025-08-09T10:51:32.385+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 42 for task model_training (Command '['/usr/local/bin/python', '-m', 'training.components.train', '--config', '/opt/airflow/project/config/config.yaml', '--params', '/opt/airflow/project/config/params.yaml']' returned non-zero exit status 1.; 337)
+[2025-08-09T10:51:32.395+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-08-09T10:51:32.420+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

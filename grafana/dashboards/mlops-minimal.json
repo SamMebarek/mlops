@@ -1,0 +1,123 @@
+
+{
+  "id": null,
+  "uid": "mlops-minimal",
+  "title": "MLOps — Minimal Observability",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 2,
+  "refresh": "10s",
+  "templating": {
+    "list": [
+      { "name": "gateway_job", "type": "constant", "query": "gateway", "current": { "selected": true, "text": "gateway", "value": "gateway" } },
+      { "name": "inference_job", "type": "constant", "query": "inference", "current": { "selected": true, "text": "inference", "value": "inference" } },
+      { "name": "e_job", "type": "constant", "query": "evidently_batch", "current": { "selected": true, "text": "evidently_batch", "value": "evidently_batch" } },
+      { "name": "e_instance", "type": "constant", "query": "local", "current": { "selected": true, "text": "local", "value": "local" } },
+      { "name": "e_service", "type": "constant", "query": "evidently", "current": { "selected": true, "text": "evidently", "value": "evidently" } }
+    ]
+  },
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    { "type": "row", "title": "Gateway (FastAPI)", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 } },
+    {
+      "type": "stat",
+      "title": "Gateway — RPS (all paths)",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 1 },
+      "targets": [{ "expr": "sum(rate(http_requests_total{job=\"$gateway_job\"}[5m]))" }],
+      "fieldConfig": { "defaults": { "unit": "req/s" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Gateway — p95 Latency (s)",
+      "gridPos": { "h": 6, "w": 9, "x": 6, "y": 1 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{job=\"$gateway_job\"}[5m])))",
+          "legendFormat": "p95"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Gateway — Requests by Status",
+      "gridPos": { "h": 6, "w": 9, "x": 15, "y": 1 },
+      "targets": [{ "expr": "sum by (status) (rate(http_requests_total{job=\"$gateway_job\"}[5m]))", "legendFormat": "{{status}}" }],
+      "fieldConfig": { "defaults": { "unit": "req/s" } }
+    },
+
+    { "type": "row", "title": "Inference (FastAPI)", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 } },
+    {
+      "type": "timeseries",
+      "title": "Inference — /predict RPS",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 8 },
+      "targets": [{ "expr": "sum by (handler) (rate(http_requests_total{job=\"$inference_job\", handler=\"/predict\"}[5m]))", "legendFormat": "{{handler}}" }],
+      "fieldConfig": { "defaults": { "unit": "req/s" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Inference — /predict p95 Latency (s)",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{job=\"$inference_job\", handler=\"/predict\"}[5m])))",
+          "legendFormat": "predict p95"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Inference — /reload-model RPS",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 8 },
+      "targets": [{ "expr": "sum by (handler) (rate(http_requests_total{job=\"$inference_job\", handler=\"/reload-model\"}[5m]))", "legendFormat": "{{handler}}" }],
+      "fieldConfig": { "defaults": { "unit": "req/s" } }
+    },
+
+    { "type": "row", "title": "Evidently (Drift & Data Quality)", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 } },
+    {
+      "type": "stat",
+      "title": "Drift Status",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 15 },
+      "targets": [{ "expr": "max(evidently_data_drift{job=\"$e_job\",instance=\"$e_instance\",service=\"$e_service\"})", "instant": true }],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [{ "type": "value", "options": { "0": { "text": "No drift" }, "1": { "text": "Drift" } } }],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green" }, { "color": "red", "value": 0.5 }] }
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Drift Share",
+      "gridPos": { "h": 6, "w": 9, "x": 6, "y": 15 },
+      "targets": [{ "expr": "evidently_drift_share{job=\"$e_job\",instance=\"$e_instance\",service=\"$e_service\"}", "legendFormat": "share" }],
+      "fieldConfig": { "defaults": { "unit": "percentunit" } }
+    },
+    {
+      "type": "stat",
+      "title": "Drifted Columns",
+      "gridPos": { "h": 6, "w": 9, "x": 15, "y": 15 },
+      "targets": [{ "expr": "evidently_features_drifted_total{job=\"$e_job\",instance=\"$e_instance\",service=\"$e_service\"}", "instant": true }]
+    },
+    {
+      "type": "stat",
+      "title": "Missing Values (current)",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 21 },
+      "targets": [{ "expr": "evidently_missing_values_total{job=\"$e_job\",instance=\"$e_instance\",service=\"$e_service\"}", "instant": true }]
+    },
+    {
+      "type": "stat",
+      "title": "Current Rows",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 21 },
+      "targets": [{ "expr": "evidently_current_rows_total{job=\"$e_job\",instance=\"$e_instance\",service=\"$e_service\"}", "instant": true }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Evidently Batch Run Duration (s)",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 21 },
+      "targets": [{ "expr": "evidently_run_duration_seconds{job=\"$e_job\",instance=\"$e_instance\",service=\"$e_service\"}", "legendFormat": "duration" }],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    }
+  ]
+}

@@ -11,3 +11,4 @@ starlette
 uvicorn==0.34.3
 xgboost
 python-box
+prometheus-client

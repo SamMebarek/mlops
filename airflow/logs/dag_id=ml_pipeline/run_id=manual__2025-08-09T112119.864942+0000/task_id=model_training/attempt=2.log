@@ -1,0 +1,81 @@
+[2025-08-09T11:27:14.961+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ml_pipeline.model_training manual__2025-08-09T11:21:19.864942+00:00 [queued]>
+[2025-08-09T11:27:14.976+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ml_pipeline.model_training manual__2025-08-09T11:21:19.864942+00:00 [queued]>
+[2025-08-09T11:27:14.977+0000] {taskinstance.py:2170} INFO - Starting attempt 2 of 2
+[2025-08-09T11:27:14.999+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): model_training> on 2025-08-09 11:21:19.864942+00:00
+[2025-08-09T11:27:15.010+0000] {standard_task_runner.py:60} INFO - Started process 338 to run task
+[2025-08-09T11:27:15.015+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'ml_pipeline', 'model_training', 'manual__2025-08-09T11:21:19.864942+00:00', '--job-id', '51', '--raw', '--subdir', 'DAGS_FOLDER/ml_pipeline.py', '--cfg-path', '/tmp/tmp873ehohn']
+[2025-08-09T11:27:15.019+0000] {standard_task_runner.py:88} INFO - Job 51: Subtask model_training
+[2025-08-09T11:27:15.147+0000] {task_command.py:423} INFO - Running <TaskInstance: ml_pipeline.model_training manual__2025-08-09T11:21:19.864942+00:00 [running]> on host b6c8c1bbfaf4
+[2025-08-09T11:27:15.285+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='sarah' AIRFLOW_CTX_DAG_ID='ml_pipeline' AIRFLOW_CTX_TASK_ID='model_training' AIRFLOW_CTX_EXECUTION_DATE='2025-08-09T11:21:19.864942+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-08-09T11:21:19.864942+00:00'
+[2025-08-09T11:27:42.716+0000] {logging_mixin.py:188} INFO - STDOUT:
+[2025-08-09T11:27:42.716+0000] {logging_mixin.py:188} INFO -  Fitting 3 folds for each of 10 candidates, totalling 30 fits
+🏃 View run XGBoost_RandSearch at: https://dagshub.com/SamMebarek/mlops-som.mlflow/#/experiments/0/runs/6e85fddd03ea48dc94053d4afea9b8c3
+🧪 View experiment at: https://dagshub.com/SamMebarek/mlops-som.mlflow/#/experiments/0
+[2025-08-09T11:27:42.717+0000] {logging_mixin.py:188} INFO - STDERR:
+[2025-08-09T11:27:42.717+0000] {logging_mixin.py:188} INFO -  2025-08-09 11:27:17,990 - training.utils.common - INFO - YAML chargé : /opt/***/project/config/config.yaml
+2025-08-09 11:27:17,997 - training.utils.common - INFO - YAML chargé : /opt/***/project/config/params.yaml
+2025-08-09 11:27:17,998 - training.utils.common - INFO - Répertoire créé ou existant : /opt/***/project/models
+2025-08-09 11:27:17,999 - training.utils.common - INFO - Répertoire créé ou existant : /opt/***/project/models
+2025-08-09 11:27:18,738 - __main__ - INFO - Loaded processed data: /opt/***/project/data/processed/clean_data.csv (shape=(108060, 14))
+2025-08-09 11:27:18,759 - __main__ - INFO - Split data: train_shape=(86448, 11), test_shape=(21612, 11)
+2025/08/09 11:27:18 WARNING mlflow.utils.git_utils: Failed to import Git (the Git executable is probably not on your PATH), so Git SHA is not available. Error: Failed to initialize: Bad git executable.
+The git executable must be specified in one of the following ways:
+    - be included in your $PATH
+    - be set via $GIT_PYTHON_GIT_EXECUTABLE
+    - explicitly set via git.refresh(<full-path-to-git-executable>)
+
+All git commands will error until this is rectified.
+
+This initial message can be silenced or aggravated in the future by setting the
+$GIT_PYTHON_REFRESH environment variable. Use one of the following values:
+    - quiet|q|silence|s|silent|none|n|0: for no message or exception
+    - warn|w|warning|log|l|1: for a warning message (logging level CRITICAL, displayed by default)
+    - error|e|exception|raise|r|2: for a raised exception
+
+Example:
+    export GIT_PYTHON_REFRESH=quiet
+
+2025-08-09 11:27:19,226 - __main__ - INFO - Starting hyperparameter search and training.
+2025-08-09 11:27:28,973 - __main__ - INFO - Best params: {'colsample_bytree': 0.9219644132807024, 'gamma': 0.06692515264078093, 'learning_rate': 0.19307895078298942, 'max_depth': 5, 'n_estimators': 86, 'subsample': 0.6271914913054505}
+2025-08-09 11:27:28,973 - __main__ - INFO - R^2 score: 0.9998
+2025/08/09 11:27:41 INFO mlflow.store.model_registry.abstract_store: Waiting up to 300 seconds for model version to finish creation. Model name: PriceFixerModel, version 38
+2025-08-09 11:27:41,256 - __main__ - INFO - Registered model 'PriceFixerModel' from source=mlflow-artifacts:/4829b4e5ce254fea8f678e40a4133671/6e85fddd03ea48dc94053d4afea9b8c3/artifacts/xgb_model, run_id=6e85fddd03ea48dc94053d4afea9b8c3
+2025-08-09 11:27:41,587 - __main__ - ERROR - Training failed: [Errno 13] Permission denied: '/opt/***/project/models/xgb_model.pkl'
+Traceback (most recent call last):
+  File "/opt/***/project/src/training/components/train.py", line 215, in run_training
+    repo.save(search.best_estimator_)
+  File "/opt/***/project/src/training/repository/repository.py", line 42, in save
+    joblib.dump(model, str(self.model_path))
+  File "/home/***/.local/lib/python3.10/site-packages/joblib/numpy_pickle.py", line 599, in dump
+    with open(filename, "wb") as f:
+PermissionError: [Errno 13] Permission denied: '/opt/***/project/models/xgb_model.pkl'
+2025-08-09 11:27:41,604 - __main__ - INFO - Pushed metrics to Pushgateway (http://pushgateway:9091) status=0 duration_s=23.623 rows=108060 r2=0.9997696380635521 artifact_bytes=0
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/local/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/opt/***/project/src/training/components/train.py", line 239, in <module>
+    run_training(args.config, args.params)
+  File "/opt/***/project/src/training/components/train.py", line 215, in run_training
+    repo.save(search.best_estimator_)
+  File "/opt/***/project/src/training/repository/repository.py", line 42, in save
+    joblib.dump(model, str(self.model_path))
+  File "/home/***/.local/lib/python3.10/site-packages/joblib/numpy_pickle.py", line 599, in dump
+    with open(filename, "wb") as f:
+PermissionError: [Errno 13] Permission denied: '/opt/***/project/models/xgb_model.pkl'
+[2025-08-09T11:27:42.718+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.10/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.10/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.10/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/ml_pipeline.py", line 62, in run_training
+    raise subprocess.CalledProcessError(res.returncode, res.args, res.stdout, res.stderr)
+subprocess.CalledProcessError: Command '['/usr/local/bin/python', '-m', 'training.components.train', '--config', '/opt/airflow/project/config/config.yaml', '--params', '/opt/airflow/project/config/params.yaml']' returned non-zero exit status 1.
+[2025-08-09T11:27:42.731+0000] {taskinstance.py:1138} INFO - Marking task as FAILED. dag_id=ml_pipeline, task_id=model_training, execution_date=20250809T112119, start_date=20250809T112714, end_date=20250809T112742
+[2025-08-09T11:27:42.747+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 51 for task model_training (Command '['/usr/local/bin/python', '-m', 'training.components.train', '--config', '/opt/airflow/project/config/config.yaml', '--params', '/opt/airflow/project/config/params.yaml']' returned non-zero exit status 1.; 338)
+[2025-08-09T11:27:42.793+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-08-09T11:27:42.823+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

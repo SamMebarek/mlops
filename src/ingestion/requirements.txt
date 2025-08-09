@@ -2,3 +2,4 @@ pandas==2.3.0
 python_box
 PyYAML==6.0.2
 python-box
+prometheus_client

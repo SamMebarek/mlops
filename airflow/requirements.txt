@@ -1,6 +1,11 @@
-python-box<5
+python-box
 xgboost
 scikit-learn
 pandas
 pyyaml
 mlflow
+numpy
+python-dotenv
+requests
+evidently
+prometheus-client
