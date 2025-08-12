@@ -1,5 +1,5 @@
-numpy==2.3.0
-pandas==2.3.0
+numpy
+pandas
 python_box==7.3.2
 PyYAML==6.0.2
 prometheus_client
