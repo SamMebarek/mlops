@@ -1,0 +1,32 @@
+[2025-08-10T15:20:38.572+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: train_with_dvc.train manual__2025-08-10T15:20:29.770440+00:00 [queued]>
+[2025-08-10T15:20:38.584+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: train_with_dvc.train manual__2025-08-10T15:20:29.770440+00:00 [queued]>
+[2025-08-10T15:20:38.585+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2025-08-10T15:20:38.607+0000] {taskinstance.py:2191} INFO - Executing <Task(BashOperator): train> on 2025-08-10 15:20:29.770440+00:00
+[2025-08-10T15:20:38.616+0000] {standard_task_runner.py:60} INFO - Started process 231 to run task
+[2025-08-10T15:20:38.623+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'train_with_dvc', 'train', 'manual__2025-08-10T15:20:29.770440+00:00', '--job-id', '83', '--raw', '--subdir', 'DAGS_FOLDER/train_with_dvc.py', '--cfg-path', '/tmp/tmpd7pd9z6g']
+[2025-08-10T15:20:38.628+0000] {standard_task_runner.py:88} INFO - Job 83: Subtask train
+[2025-08-10T15:20:38.725+0000] {task_command.py:423} INFO - Running <TaskInstance: train_with_dvc.train manual__2025-08-10T15:20:29.770440+00:00 [running]> on host 620e18b1de0e
+[2025-08-10T15:20:38.867+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='train_with_dvc' AIRFLOW_CTX_TASK_ID='train' AIRFLOW_CTX_EXECUTION_DATE='2025-08-10T15:20:29.770440+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-08-10T15:20:29.770440+00:00'
+[2025-08-10T15:20:38.869+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2025-08-10T15:20:38.871+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', '\nset -e\ncd /opt/***/project\nbash scripts/run_training.sh']
+[2025-08-10T15:20:38.887+0000] {subprocess.py:86} INFO - Output:
+[2025-08-10T15:20:38.899+0000] {subprocess.py:93} INFO - [INFO] dvc pull...
+[2025-08-10T15:20:44.081+0000] {subprocess.py:93} INFO - M       evaluation/scores.json
+[2025-08-10T15:20:44.082+0000] {subprocess.py:93} INFO - M       models/xgb_model.pkl
+[2025-08-10T15:20:44.083+0000] {subprocess.py:93} INFO - M       data/raw/ingested_data.csv
+[2025-08-10T15:20:44.083+0000] {subprocess.py:93} INFO - M       data/processed/clean_data.csv
+[2025-08-10T15:20:44.093+0000] {subprocess.py:93} INFO - 4 files modified
+[2025-08-10T15:20:44.537+0000] {subprocess.py:93} INFO - [INFO] Lancement de l'entraînement...
+[2025-08-10T15:20:44.576+0000] {subprocess.py:93} INFO - /usr/local/bin/python: Error while finding module specification for 'training.components.train' (ModuleNotFoundError: No module named 'training')
+[2025-08-10T15:20:44.581+0000] {subprocess.py:97} INFO - Command exited with return code 1
+[2025-08-10T15:20:44.594+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.10/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.10/site-packages/airflow/operators/bash.py", line 212, in execute
+    raise AirflowException(
+airflow.exceptions.AirflowException: Bash command failed. The command returned a non-zero exit code 1.
+[2025-08-10T15:20:44.598+0000] {taskinstance.py:1138} INFO - Marking task as FAILED. dag_id=train_with_dvc, task_id=train, execution_date=20250810T152029, start_date=20250810T152038, end_date=20250810T152044
+[2025-08-10T15:20:44.618+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 83 for task train (Bash command failed. The command returned a non-zero exit code 1.; 231)
+[2025-08-10T15:20:44.663+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-08-10T15:20:44.681+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

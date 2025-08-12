@@ -8,6 +8,9 @@ import shutil
 from pathlib import Path
 from typing import Optional
 from datetime import datetime, timezone
+import subprocess  # <-- [NOUVEAU] pour récupérer le SHA git
+import hashlib     # <-- [NOUVEAU] fallback hash local
+import yaml        # <-- [NOUVEAU] lire le .dvc si présent
 
 import pandas as pd
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
@@ -96,6 +99,55 @@ def _dir_size_bytes(p: Path) -> int:
     return total
 
 
+# ---------- [NOUVEAU] Utilitaires traçabilité données & code ----------
+
+def _dvc_version_for(data_file: Path) -> Optional[str]:
+    """
+    Retourne l'identifiant de version DVC pour un fichier suivi.
+    Stratégie:
+      1) Lire le .dvc associé (ex: clean_data.csv.dvc) et extraire 'md5' / 'etag' / 'hash'
+      2) Si non disponible, retourner None (on fera un fallback hash local)
+    """
+    dvc_ptr = data_file.with_suffix(data_file.suffix + ".dvc")
+    if not dvc_ptr.exists():
+        return None
+    try:
+        with open(dvc_ptr, "r", encoding="utf-8") as f:
+            meta = yaml.safe_load(f) or {}
+        outs = meta.get("outs") or meta.get("outs_no_cache") or []
+        if not outs:
+            return None
+        entry = outs[0] or {}
+        # champs possibles selon backends DVC
+        return entry.get("md5") or entry.get("etag") or entry.get("hash") or None
+    except Exception:
+        return None
+
+
+def _file_md5(p: Path) -> str:
+    """
+    Calcule un hash MD5 local (fallback si DVC non disponible).
+    """
+    h = hashlib.md5()
+    with open(p, "rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _git_sha() -> Optional[str]:
+    """
+    Retourne le commit SHA git courant (ou None si indisponible).
+    """
+    try:
+        res = subprocess.run(["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True)
+        return res.stdout.strip()
+    except Exception:
+        return None
+
+# ---------------------------------------------------------------------
+
+
 def run_training(config_path: str, params_path: str):
     t0 = time.perf_counter()
     status = 0
@@ -126,6 +178,13 @@ def run_training(config_path: str, params_path: str):
         if "Prix" not in df.columns:
             logger.error("Target column 'Prix' missing.")
             return
+
+        # -------- [NOUVEAU] Déterminer la version des données & le SHA git --------
+        # 1) Essayer de lire la version DVC du CSV (sinon fallback MD5 local)
+        data_version = _dvc_version_for(data_path) or _file_md5(data_path)
+        # 2) SHA du code au moment de l'entraînement
+        git_sha = _git_sha()
+        # --------------------------------------------------------------------------
 
         # Features/target
         y = df["Prix"].values
@@ -160,6 +219,14 @@ def run_training(config_path: str, params_path: str):
         # Train + log
         with mlflow.start_run(run_name="XGBoost_RandSearch") as active_run:
             logger.info("Starting hyperparameter search and training.")
+
+            # -------- [NOUVEAU] Journaliser la traçabilité avant l'entraînement -----
+            # Ces paramètres permettent de relier modèle ↔ données ↔ code.
+            mlflow.log_param("data_version", data_version)
+            if git_sha:
+                mlflow.log_param("git_sha", git_sha)
+            # ------------------------------------------------------------------------
+
             search.fit(X_train, y_train)
 
             y_pred = search.predict(X_test)
@@ -172,7 +239,6 @@ def run_training(config_path: str, params_path: str):
             mlflow.log_params(best_params)
 
             # --------- DagsHub-friendly model logging & registration ----------
-            # Save model locally to a UNIQUE directory (clean if exists on retry)
             local_model_dir = _unique_local_model_dir()
             if local_model_dir.exists():
                 shutil.rmtree(local_model_dir)
@@ -185,10 +251,8 @@ def run_training(config_path: str, params_path: str):
                 input_example=X_test.iloc[:1],
             )
 
-            # Log the saved directory as artifacts under "xgb_model"
             mlflow.log_artifacts(str(local_model_dir), artifact_path="xgb_model")
 
-            # Register via client using artifact URI (works with DagsHub)
             run_id = active_run.info.run_id
             artifact_uri = mlflow.get_artifact_uri("xgb_model")
             client = MlflowClient()
@@ -214,7 +278,6 @@ def run_training(config_path: str, params_path: str):
         repo = CsvModelRepository(model_path)
         repo.save(search.best_estimator_)
 
-        # Compute artifact bytes: pickle + local MLflow dir
         if model_path.exists():
             artifact_bytes = model_path.stat().st_size
         artifact_bytes += _dir_size_bytes(local_model_dir)

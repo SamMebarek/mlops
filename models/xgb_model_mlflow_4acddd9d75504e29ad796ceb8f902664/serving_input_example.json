@@ -1,0 +1,32 @@
+{
+  "dataframe_split": {
+    "columns": [
+      "PrixInitial",
+      "AgeProduitEnJours",
+      "QuantiteVendue",
+      "UtiliteProduit",
+      "ElasticitePrix",
+      "Remise",
+      "Qualite",
+      "Mois_sin",
+      "Mois_cos",
+      "Heure_sin",
+      "Heure_cos"
+    ],
+    "data": [
+      [
+        462.8117116579494,
+        330.0,
+        0.0,
+        -19.514452962120544,
+        0.0524835705892621,
+        0.0,
+        0.7080725777960455,
+        0.4999999999999999,
+        -0.8660254037844387,
+        -0.8660254037844384,
+        -0.5000000000000004
+      ]
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.10.13
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.1
+is_signature_from_type_hint: false
+mlflow_version: 3.2.0
+model_id: null
+model_size_bytes: 530570
+model_uuid: ca6f1898f1784b64ba1e26096f9bc5e8
+prompts: null
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "double", "name": "AgeProduitEnJours", "required": true}, {"type":
+    "double", "name": "QuantiteVendue", "required": true}, {"type": "double", "name":
+    "UtiliteProduit", "required": true}, {"type": "double", "name": "ElasticitePrix",
+    "required": true}, {"type": "double", "name": "Remise", "required": true}, {"type":
+    "double", "name": "Qualite", "required": true}, {"type": "double", "name": "Mois_sin",
+    "required": true}, {"type": "double", "name": "Mois_cos", "required": true}, {"type":
+    "double", "name": "Heure_sin", "required": true}, {"type": "double", "name": "Heure_cos",
+    "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "float32", "shape": [-1]}}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-08-11 07:29:28.299176'

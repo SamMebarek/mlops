@@ -9,3 +9,4 @@ python-dotenv
 requests
 evidently
 prometheus-client
+dvc[s3]

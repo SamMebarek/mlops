@@ -1,0 +1,56 @@
+[2025-08-11T06:42:39.202+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: train_with_dvc.train manual__2025-08-11T06:42:28.866473+00:00 [queued]>
+[2025-08-11T06:42:39.218+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: train_with_dvc.train manual__2025-08-11T06:42:28.866473+00:00 [queued]>
+[2025-08-11T06:42:39.218+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2025-08-11T06:42:39.238+0000] {taskinstance.py:2191} INFO - Executing <Task(BashOperator): train> on 2025-08-11 06:42:28.866473+00:00
+[2025-08-11T06:42:39.246+0000] {standard_task_runner.py:60} INFO - Started process 211 to run task
+[2025-08-11T06:42:39.251+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'train_with_dvc', 'train', 'manual__2025-08-11T06:42:28.866473+00:00', '--job-id', '89', '--raw', '--subdir', 'DAGS_FOLDER/train_with_dvc.py', '--cfg-path', '/tmp/tmp2gzw6pm4']
+[2025-08-11T06:42:39.254+0000] {standard_task_runner.py:88} INFO - Job 89: Subtask train
+[2025-08-11T06:42:39.339+0000] {task_command.py:423} INFO - Running <TaskInstance: train_with_dvc.train manual__2025-08-11T06:42:28.866473+00:00 [running]> on host bd0e889be214
+[2025-08-11T06:42:39.431+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='train_with_dvc' AIRFLOW_CTX_TASK_ID='train' AIRFLOW_CTX_EXECUTION_DATE='2025-08-11T06:42:28.866473+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-08-11T06:42:28.866473+00:00'
+[2025-08-11T06:42:39.433+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2025-08-11T06:42:39.435+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', '\nset -e\ncd /opt/***/project\nbash scripts/run_training.sh']
+[2025-08-11T06:42:39.453+0000] {subprocess.py:86} INFO - Output:
+[2025-08-11T06:42:39.477+0000] {subprocess.py:93} INFO - [INFO] dvc pull...
+[2025-08-11T06:42:45.201+0000] {subprocess.py:93} INFO - M       evaluation/scores.json
+[2025-08-11T06:42:45.202+0000] {subprocess.py:93} INFO - M       data/raw/ingested_data.csv
+[2025-08-11T06:42:45.212+0000] {subprocess.py:93} INFO - 2 files modified
+[2025-08-11T06:42:45.553+0000] {subprocess.py:93} INFO - [INFO] Lancement de l'entraînement...
+[2025-08-11T06:42:50.675+0000] {subprocess.py:93} INFO - 2025-08-11 06:42:50,675 - training.utils.common - INFO - YAML chargé : /opt/***/project/config/config.yaml
+[2025-08-11T06:42:50.685+0000] {subprocess.py:93} INFO - 2025-08-11 06:42:50,685 - training.utils.common - INFO - YAML chargé : /opt/***/project/config/params.yaml
+[2025-08-11T06:42:50.686+0000] {subprocess.py:93} INFO - 2025-08-11 06:42:50,686 - training.utils.common - INFO - Répertoire créé ou existant : /opt/***/project/models
+[2025-08-11T06:42:50.687+0000] {subprocess.py:93} INFO - 2025-08-11 06:42:50,687 - training.utils.common - INFO - Répertoire créé ou existant : /opt/***/project/models
+[2025-08-11T06:42:51.948+0000] {subprocess.py:93} INFO - 2025-08-11 06:42:51,948 - __main__ - INFO - Loaded processed data: /opt/***/project/data/processed/clean_data.csv (shape=(108060, 13))
+[2025-08-11T06:42:52.480+0000] {subprocess.py:93} INFO - 2025-08-11 06:42:52,480 - __main__ - INFO - Split data: train_shape=(86448, 10), test_shape=(21612, 10)
+[2025-08-11T06:42:52.683+0000] {subprocess.py:93} INFO - 2025/08/11 06:42:52 WARNING mlflow.utils.git_utils: Failed to import Git (the Git executable is probably not on your PATH), so Git SHA is not available. Error: Failed to initialize: Bad git executable.
+[2025-08-11T06:42:52.684+0000] {subprocess.py:93} INFO - The git executable must be specified in one of the following ways:
+[2025-08-11T06:42:52.685+0000] {subprocess.py:93} INFO -     - be included in your $PATH
+[2025-08-11T06:42:52.686+0000] {subprocess.py:93} INFO -     - be set via $GIT_PYTHON_GIT_EXECUTABLE
+[2025-08-11T06:42:52.686+0000] {subprocess.py:93} INFO -     - explicitly set via git.refresh(<full-path-to-git-executable>)
+[2025-08-11T06:42:52.687+0000] {subprocess.py:93} INFO - 
+[2025-08-11T06:42:52.688+0000] {subprocess.py:93} INFO - All git commands will error until this is rectified.
+[2025-08-11T06:42:52.689+0000] {subprocess.py:93} INFO - 
+[2025-08-11T06:42:52.689+0000] {subprocess.py:93} INFO - This initial message can be silenced or aggravated in the future by setting the
+[2025-08-11T06:42:52.691+0000] {subprocess.py:93} INFO - $GIT_PYTHON_REFRESH environment variable. Use one of the following values:
+[2025-08-11T06:42:52.692+0000] {subprocess.py:93} INFO -     - quiet|q|silence|s|silent|none|n|0: for no message or exception
+[2025-08-11T06:42:52.693+0000] {subprocess.py:93} INFO -     - warn|w|warning|log|l|1: for a warning message (logging level CRITICAL, displayed by default)
+[2025-08-11T06:42:52.694+0000] {subprocess.py:93} INFO -     - error|e|exception|raise|r|2: for a raised exception
+[2025-08-11T06:42:52.695+0000] {subprocess.py:93} INFO - 
+[2025-08-11T06:42:52.695+0000] {subprocess.py:93} INFO - Example:
+[2025-08-11T06:42:52.696+0000] {subprocess.py:93} INFO -     export GIT_PYTHON_REFRESH=quiet
+[2025-08-11T06:42:52.697+0000] {subprocess.py:93} INFO - 
+[2025-08-11T06:42:53.002+0000] {subprocess.py:93} INFO - 2025-08-11 06:42:53,002 - __main__ - INFO - Starting hyperparameter search and training.
+[2025-08-11T06:42:53.225+0000] {subprocess.py:93} INFO - Fitting 3 folds for each of 10 candidates, totalling 30 fits
+[2025-08-11T06:43:03.806+0000] {subprocess.py:93} INFO - 2025-08-11 06:43:03,806 - __main__ - INFO - Best params: {'colsample_bytree': 0.6603626777682708, 'gamma': 0.01657240506474713, 'learning_rate': 0.1464270668036927, 'max_depth': 6, 'n_estimators': 113, 'subsample': 0.8049969668130992}
+[2025-08-11T06:43:03.807+0000] {subprocess.py:93} INFO - 2025-08-11 06:43:03,806 - __main__ - INFO - R^2 score: 0.9942
+[2025-08-11T06:43:17.041+0000] {subprocess.py:93} INFO - 2025/08/11 06:43:17 INFO mlflow.store.model_registry.abstract_store: Waiting up to 300 seconds for model version to finish creation. Model name: PriceFixerModel, version 50
+[2025-08-11T06:43:17.042+0000] {subprocess.py:93} INFO - 2025-08-11 06:43:17,041 - __main__ - INFO - Registered model 'PriceFixerModel' from source=mlflow-artifacts:/4829b4e5ce254fea8f678e40a4133671/815f0c5a3415468184c58760bc3fa7f6/artifacts/xgb_model, run_id=815f0c5a3415468184c58760bc3fa7f6
+[2025-08-11T06:43:17.422+0000] {subprocess.py:93} INFO - 2025-08-11 06:43:17,422 - training.repository.repository - INFO - Modèle sauvegardé → /opt/***/project/models/xgb_model.pkl
+[2025-08-11T06:43:17.452+0000] {subprocess.py:93} INFO - 2025-08-11 06:43:17,452 - __main__ - INFO - Local MLflow dir: models/xgb_model_mlflow_manual__2025-08-11T06:42:28.866473+00:00 (size=532572 bytes)
+[2025-08-11T06:43:17.452+0000] {subprocess.py:93} INFO - 2025-08-11 06:43:17,452 - __main__ - INFO - Model saved locally at: /opt/***/project/models/xgb_model.pkl
+[2025-08-11T06:43:17.457+0000] {subprocess.py:93} INFO - 2025-08-11 06:43:17,457 - __main__ - INFO - Pushed metrics to Pushgateway (http://pushgateway:9091) status=1 duration_s=26.793 rows=108060 r2=0.994226103814218 artifact_bytes=1062279
+[2025-08-11T06:43:18.169+0000] {subprocess.py:93} INFO - 🏃 View run XGBoost_RandSearch at: https://dagshub.com/SamMebarek/mlops-som.mlflow/#/experiments/0/runs/815f0c5a3415468184c58760bc3fa7f6
+[2025-08-11T06:43:18.169+0000] {subprocess.py:93} INFO - 🧪 View experiment at: https://dagshub.com/SamMebarek/mlops-som.mlflow/#/experiments/0
+[2025-08-11T06:43:18.652+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2025-08-11T06:43:18.691+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=train_with_dvc, task_id=train, execution_date=20250811T064228, start_date=20250811T064239, end_date=20250811T064318
+[2025-08-11T06:43:18.735+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2025-08-11T06:43:18.755+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

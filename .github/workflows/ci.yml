@@ -1,33 +1,70 @@
-name: CI Pipeline
+name: CI
 
 on:
   push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
-  build:
+  ci:
     runs-on: ubuntu-latest
 
+    env:
+      # Chemin source pour les imports Python pendant les tests
+      PYTHONPATH: src
+
     steps:
-      - name: 📥 Checkout du code
-        uses: actions/checkout@v3
+      # --- Récupération du code ---
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v4
+      # --- Installation Python + cache pip ---
+      # Note: garde une version unique et stable de Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: '3.12'
+          cache: 'pip'
 
-      - name: ⚙️ Installer les dépendances Airflow
-        run: pip install -r airflow/requirements.txt
-
-      - name: ⚙️ Installer les dépendances du training
-        run: pip install -r src/training/requirements.txt
-
-      - name: ✅ Vérifier l’import des modules principaux
+      # --- Dépendances (strictement nécessaires à la CI) ---
+      # On installe ruff/black/pytest puis tous les requirements des sous-modules.
+      - name: Install dependencies
         run: |
-          python -c "import sklearn"
-          python -c "import xgboost"
-          python -c "import mlflow"
+          python -m pip install --upgrade pip
+          pip install ruff==0.5.6 black==24.4.2 pytest==8.2.0
+          # Installe tous les requirements de services si présents
+          if compgen -G "src/*/requirements.txt" > /dev/null; then
+            while IFS= read -r -d '' f; do
+              echo "Installing: $f"
+              pip install -r "$f"
+            done < <(find src -maxdepth 2 -type f -name "requirements.txt" -print0)
+          fi
 
+      # --- Lint (Ruff) ---
+      - name: Ruff (lint)
+        run: |
+          ruff check .
+
+      # --- Vérification de format (Black) ---
+      - name: Black (format check)
+        run: |
+          black --check .
+
+      # --- Tests unitaires (si le dossier tests/ existe) ---
+      - name: Unit tests
+        run: |
+          if [ -d "tests" ]; then
+            echo "Running pytest..."
+            pytest -q
+          else
+            echo "Aucun dossier tests/ trouvé, étape ignorée."
+          fi
+
+      # --- Build Docker des services critiques ---
+      # Construction locale uniquement (pas de push registry en CI)
+      - name: Build Docker image (inference)
+        run: |
+          docker build -f src/inference/Dockerfile -t inference:ci .
+
+      - name: Build Docker image (gateway)
+        run: |
+          docker build -f src/gateway/Dockerfile -t gateway:ci .
