@@ -1,9 +1,9 @@
-mlflow==3.2.0
+mlflow
 cloudpickle==3.1.1
-numpy==1.24.4
-pandas==2.1.4
+numpy
+pandas
 psutil==5.9.7
 pyarrow==14.0.2
-scikit-learn==1.7.1
-scipy==1.15.3
-xgboost==3.0.3
+scikit-learn
+scipy
+xgboost
