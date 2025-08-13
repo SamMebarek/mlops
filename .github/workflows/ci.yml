@@ -42,7 +42,7 @@ jobs:
       # --- Lint (Ruff) ---
       - name: Ruff (lint)
         run: |
-          ruff check .
+          ruff check . --fix
 
       # --- Vérification de format (Black) ---
       - name: Black (format check)
