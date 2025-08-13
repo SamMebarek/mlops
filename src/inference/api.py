@@ -74,11 +74,7 @@ def init_service():
 @app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
     start = time.perf_counter()
-    path = (
-        request.scope.get("route").path
-        if request.scope.get("route")
-        else request.url.path
-    )
+    path = request.scope.get("route").path if request.scope.get("route") else request.url.path
     method = request.method
     try:
         resp = await call_next(request)
@@ -127,9 +123,7 @@ def predict(req: PredictionRequest, request: Request):
     # Ensure Authorization header present (trust the gateway for JWT/roles)
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
-        raise HTTPException(
-            status_code=401, detail="Missing or invalid Authorization header"
-        )
+        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
 
     service: PredictionService = request.app.state.service
     t0 = time.perf_counter()
@@ -158,9 +152,7 @@ def reload_model(request: Request):
     # Ensure Authorization header present (trust the gateway for JWT/roles)
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
-        raise HTTPException(
-            status_code=401, detail="Missing or invalid Authorization header"
-        )
+        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
 
     service: PredictionService = request.app.state.service
     try:

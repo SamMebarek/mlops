@@ -83,9 +83,7 @@ def run_training():
     print("STDOUT:\n", res.stdout)
     print("STDERR:\n", res.stderr)
     if res.returncode != 0:
-        raise subprocess.CalledProcessError(
-            res.returncode, res.args, res.stdout, res.stderr
-        )
+        raise subprocess.CalledProcessError(res.returncode, res.args, res.stdout, res.stderr)
 
 
 def run_evaluation():
@@ -107,9 +105,7 @@ def run_evaluation():
     print("STDOUT:\n", res.stdout)
     print("STDERR:\n", res.stderr)
     if res.returncode != 0:
-        raise subprocess.CalledProcessError(
-            res.returncode, res.args, res.stdout, res.stderr
-        )
+        raise subprocess.CalledProcessError(res.returncode, res.args, res.stdout, res.stderr)
 
 
 def run_evidently_batch():
@@ -140,9 +136,7 @@ def run_evidently_batch():
     print("STDOUT:\n", res.stdout)
     print("STDERR:\n", res.stderr)
     if res.returncode != 0:
-        raise subprocess.CalledProcessError(
-            res.returncode, res.args, res.stdout, res.stderr
-        )
+        raise subprocess.CalledProcessError(res.returncode, res.args, res.stdout, res.stderr)
 
 
 def reload_model_via_gateway():

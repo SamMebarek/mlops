@@ -55,9 +55,7 @@ def predict_form():
                         f"Timestamp: {result['timestamp']}"
                     )
                 else:
-                    st.error(
-                        f"Prediction failed: {resp.json().get('detail', resp.text)}"
-                    )
+                    st.error(f"Prediction failed: {resp.json().get('detail', resp.text)}")
             except Exception as e:
                 st.error(f"Prediction failed: {e}")
 
@@ -67,9 +65,7 @@ def predict_form():
             token = st.session_state.get("jwt_token")
             headers = {"Authorization": f"Bearer {token}"}
             try:
-                resp = requests.post(
-                    f"{GATEWAY_URL}/reload-model", headers=headers, timeout=5
-                )
+                resp = requests.post(f"{GATEWAY_URL}/reload-model", headers=headers, timeout=5)
                 if resp.status_code == 200:
                     st.success("Model reloaded successfully.")
                 else:

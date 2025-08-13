@@ -53,8 +53,6 @@ class DvcDataRepository(DataRepository):
             raise RuntimeError(f"DVC pull failed for {self.dvc_target}: {e}")
 
         if not self.csv_path.exists():
-            raise FileNotFoundError(
-                f"CSV file not found after DVC pull: {self.csv_path}"
-            )
+            raise FileNotFoundError(f"CSV file not found after DVC pull: {self.csv_path}")
         df = pd.read_csv(self.csv_path, encoding="utf-8")
         return df

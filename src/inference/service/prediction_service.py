@@ -84,6 +84,4 @@ class PredictionService:
         predicted_price = float(predicted_array[0])
 
         # 8. Retourner le DTO
-        return PredictionResult(
-            sku=sku, timestamp=now, predicted_price=round(predicted_price, 2)
-        )
+        return PredictionResult(sku=sku, timestamp=now, predicted_price=round(predicted_price, 2))

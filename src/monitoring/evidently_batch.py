@@ -53,9 +53,7 @@ def _extract_metrics_as_numbers(report_dict: Dict[str, Any]) -> Dict[str, float]
         ):
             drift_share = drift_share or res.get("share_of_drifted_columns")
             n_drifted = n_drifted or res.get("number_of_drifted_columns")
-            data_drift = (
-                data_drift or res.get("dataset_drift") or res.get("drift_detected")
-            )
+            data_drift = data_drift or res.get("dataset_drift") or res.get("drift_detected")
 
         # Data summary (current stats live under result.current)
         if metric_name in (
@@ -64,25 +62,15 @@ def _extract_metrics_as_numbers(report_dict: Dict[str, Any]) -> Dict[str, float]
             "DataSummaryTable",
         ):
             cur = res.get("current", {}) or {}
-            current_rows = (
-                current_rows or cur.get("number_of_rows") or cur.get("n_rows")
-            )
+            current_rows = current_rows or cur.get("number_of_rows") or cur.get("n_rows")
             missing_total = (
-                missing_total
-                or cur.get("number_of_missing_values")
-                or cur.get("n_missing_values")
+                missing_total or cur.get("number_of_missing_values") or cur.get("n_missing_values")
             )
 
-    out["evidently_drift_share"] = (
-        float(drift_share) if drift_share is not None else 0.0
-    )
-    out["evidently_features_drifted_total"] = (
-        float(n_drifted) if n_drifted is not None else 0.0
-    )
+    out["evidently_drift_share"] = float(drift_share) if drift_share is not None else 0.0
+    out["evidently_features_drifted_total"] = float(n_drifted) if n_drifted is not None else 0.0
     out["evidently_data_drift"] = 1.0 if bool(data_drift) else 0.0
-    out["evidently_current_rows_total"] = (
-        float(current_rows) if current_rows is not None else 0.0
-    )
+    out["evidently_current_rows_total"] = float(current_rows) if current_rows is not None else 0.0
     out["evidently_missing_values_total"] = (
         float(missing_total) if missing_total is not None else 0.0
     )
@@ -94,9 +82,7 @@ def _push_metrics(
 ) -> None:
     """Push gauges to Pushgateway; don't raise."""
     reg = CollectorRegistry()
-    gauges = {
-        name: Gauge(name, f"{name} (evidently)", registry=reg) for name in metrics
-    }
+    gauges = {name: Gauge(name, f"{name} (evidently)", registry=reg) for name in metrics}
     for k, v in metrics.items():
         gauges[k].set(float(v))
     push_to_gateway(gateway, job=job, grouping_key=grouping, registry=reg)
@@ -142,15 +128,11 @@ def run(
         as_dict = report.as_dict()
 
     numbers = _extract_metrics_as_numbers(as_dict)
-    numbers.setdefault(
-        "evidently_run_duration_seconds", float(time.perf_counter() - t0)
-    )
+    numbers.setdefault("evidently_run_duration_seconds", float(time.perf_counter() - t0))
 
     grouping = {"instance": instance, "service": "evidently"}
     try:
-        _push_metrics(
-            numbers, job="evidently_batch", gateway=pushgateway, grouping=grouping
-        )
+        _push_metrics(numbers, job="evidently_batch", gateway=pushgateway, grouping=grouping)
         LOG.info(f"Pushed to {pushgateway}: {numbers}")
     except Exception as e:
         LOG.warning(f"Failed to push to Pushgateway: {e}")
@@ -161,9 +143,7 @@ def run(
 
 
 def main():
-    p = argparse.ArgumentParser(
-        description="Run Evidently drift/summary and push metrics."
-    )
+    p = argparse.ArgumentParser(description="Run Evidently drift/summary and push metrics.")
     p.add_argument(
         "--current",
         default=DEFAULT_CURRENT,

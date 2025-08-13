@@ -76,9 +76,7 @@ def _push_metrics(status: int, duration_s: float, rows: int) -> None:
         reg = CollectorRegistry()
         g_status = Gauge("job_status", "1=success,0=failure", registry=reg)
         g_dur = Gauge("job_duration_seconds", "Job wall time in seconds", registry=reg)
-        g_rows = Gauge(
-            "rows_processed_total", "Rows processed by the job", registry=reg
-        )
+        g_rows = Gauge("rows_processed_total", "Rows processed by the job", registry=reg)
 
         g_status.set(float(status))
         g_dur.set(float(duration_s))

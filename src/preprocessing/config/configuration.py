@@ -16,9 +16,7 @@ class ConfigurationManager:
 
     def __init__(self, config_filepath: str, params_filepath: str):
         config_path = Path(config_filepath).resolve()
-        project_root = (
-            config_path.parent.parent
-        )  # remonte deux niveaux : src/ → project_root/
+        project_root = config_path.parent.parent  # remonte deux niveaux : src/ → project_root/
         self.config = read_yaml(config_path)
         self.params = read_yaml(Path(params_filepath))
         # Crée directement data/processed sous la racine du projet

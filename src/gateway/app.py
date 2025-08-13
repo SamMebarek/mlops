@@ -91,11 +91,7 @@ async def metrics_middleware(request: Request, call_next):
     start = time.perf_counter()
 
     # Use templated route path when available to avoid high cardinality
-    path = (
-        request.scope.get("route").path
-        if request.scope.get("route")
-        else request.url.path
-    )
+    path = request.scope.get("route").path if request.scope.get("route") else request.url.path
     method = request.method
 
     try:
@@ -139,9 +135,7 @@ def decode_jwt(token: str):
 def get_current_user_role(request: Request) -> str:
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
-        raise HTTPException(
-            status_code=401, detail="Missing or invalid Authorization header"
-        )
+        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
     token = auth_header.split(" ")[1]
     payload = decode_jwt(token)
     return payload.get("role", "")

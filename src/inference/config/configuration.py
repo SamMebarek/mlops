@@ -41,9 +41,7 @@ class ConfigurationManager:
             host=self.config.inference.host,
             port=int(self.config.inference.port),
             log_level=self.config.inference.log_level,
-            admin_user=os.getenv(
-                "ADMIN_USER", self.config.inference.get("admin_user", None)
-            ),
+            admin_user=os.getenv("ADMIN_USER", self.config.inference.get("admin_user", None)),
             admin_password=os.getenv(
                 "ADMIN_PASSWORD", self.config.inference.get("admin_password", None)
             ),
@@ -56,7 +54,5 @@ class ConfigurationManager:
         """
         cfg = self._inference_config
         if not cfg.admin_user or not cfg.admin_password:
-            raise ValueError(
-                "Les variables ADMIN_USER et ADMIN_PASSWORD doivent être définies"
-            )
+            raise ValueError("Les variables ADMIN_USER et ADMIN_PASSWORD doivent être définies")
         return cfg

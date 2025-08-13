@@ -26,9 +26,7 @@ class ConfigurationManager:
         self.project_root = Path(config_path).resolve().parent.parent
 
         # Création du dossier pour les métriques
-        metrics_dir = (
-            self.project_root / Path(self.config.evaluation.metrics_output_path).parent
-        )
+        metrics_dir = self.project_root / Path(self.config.evaluation.metrics_output_path).parent
         create_directories([metrics_dir])
 
     def get_evaluation_config(self) -> EvaluationConfig:
