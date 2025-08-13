@@ -15,7 +15,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/gateway/ ./gateway/
 
 # 5. Copy .env and (optionally) config files if needed
-COPY .env ./
 
 # 6. Set unbuffered logs (optional, good for Docker)
 ENV PYTHONUNBUFFERED=1
