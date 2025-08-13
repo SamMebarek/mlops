@@ -91,7 +91,6 @@ def run_ingestion(config_path: str, params_path: str):
 
     cm = ConfigurationManager(config_path, params_path)
     ingestion_cfg = cm.get_data_ingestion_config()
-    params = cm.get_params()
 
     source_url = ingestion_cfg.source_URL
     raw_dir = ingestion_cfg.raw_data_dir

@@ -1,9 +1,7 @@
 import logging
 from pathlib import Path
-from box import ConfigBox
-
-from evaluation.utils.common import read_yaml, create_directories
 from evaluation.entity.config_entity import EvaluationConfig
+from evaluation.utils.common import read_yaml, create_directories
 
 # Logger
 logging.basicConfig(
