@@ -17,7 +17,13 @@ from inference.service.prediction_service import (
 from inference.entity.dto import PredictionResult
 
 # Prometheus
-from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import (
+    Counter,
+    Histogram,
+    Gauge,
+    generate_latest,
+    CONTENT_TYPE_LATEST,
+)
 
 # --- App initialization ---
 app = FastAPI()
@@ -46,6 +52,7 @@ PREDICTION_LATENCY = Histogram(
     buckets=(0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 5),
 )
 
+
 @app.on_event("startup")
 def init_service():
     cm = ConfigurationManager()
@@ -62,11 +69,16 @@ def init_service():
     app.state.cfg = cfg
     INFERENCE_UP.set(1)
 
+
 # --- Middleware for HTTP metrics ---
 @app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
     start = time.perf_counter()
-    path = request.scope.get("route").path if request.scope.get("route") else request.url.path
+    path = (
+        request.scope.get("route").path
+        if request.scope.get("route")
+        else request.url.path
+    )
     method = request.method
     try:
         resp = await call_next(request)
@@ -87,14 +99,17 @@ async def metrics_middleware(request: Request, call_next):
         except Exception:
             pass
 
+
 # --- Pydantic models ---
 class PredictionRequest(BaseModel):
     sku: str
+
 
 class PredictionResponse(BaseModel):
     sku: str
     timestamp: str
     predicted_price: float
+
 
 # --- Routes ---
 @app.get("/health")
@@ -106,12 +121,15 @@ def health(request: Request) -> JSONResponse:
     except Exception as e:
         return JSONResponse({"status": "ERROR", "detail": str(e)}, status_code=500)
 
+
 @app.post("/predict", response_model=PredictionResponse)
 def predict(req: PredictionRequest, request: Request):
     # Ensure Authorization header present (trust the gateway for JWT/roles)
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+        raise HTTPException(
+            status_code=401, detail="Missing or invalid Authorization header"
+        )
 
     service: PredictionService = request.app.state.service
     t0 = time.perf_counter()
@@ -134,12 +152,15 @@ def predict(req: PredictionRequest, request: Request):
         PREDICTION_LATENCY.observe(time.perf_counter() - t0)
         raise HTTPException(status_code=500, detail="Prediction error: " + str(e))
 
+
 @app.post("/reload-model")
 def reload_model(request: Request):
     # Ensure Authorization header present (trust the gateway for JWT/roles)
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+        raise HTTPException(
+            status_code=401, detail="Missing or invalid Authorization header"
+        )
 
     service: PredictionService = request.app.state.service
     try:
@@ -149,15 +170,18 @@ def reload_model(request: Request):
     except Exception as e:
         raise HTTPException(status_code=500, detail="Reload failed: " + str(e))
 
+
 # Prometheus scrape endpoint
 @app.get("/metrics")
 def metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
+
 # --- Entrée directe (rarement utilisée) ---
 if __name__ == "__main__":
     cfg = app.state.cfg
     import uvicorn
+
     uvicorn.run(
         "inference.api:app",
         host=cfg.host,

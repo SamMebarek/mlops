@@ -11,7 +11,13 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
 # --- Prometheus ---
-from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import (
+    Counter,
+    Histogram,
+    Gauge,
+    generate_latest,
+    CONTENT_TYPE_LATEST,
+)
 from starlette.responses import Response
 
 # --- Config ---
@@ -21,7 +27,7 @@ JWT_EXPIRE_MINUTES = 120
 
 USER_CREDENTIALS = {
     os.getenv("ADMIN_USER", "admin"): "admin",  # default: admin/admin
-    os.getenv("NORMAL_USER", "user"): "user",   # default: user/user
+    os.getenv("NORMAL_USER", "user"): "user",  # default: user/user
 }
 ROLES = {
     os.getenv("ADMIN_USER", "admin"): "admin",
@@ -31,23 +37,28 @@ ROLES = {
 INFERENCE_URL = os.getenv("INFERENCE_URL", "http://inference:8080/predict")
 RELOAD_URL = os.getenv("INFERENCE_RELOAD_URL", "http://inference:8080/reload-model")
 
+
 # --- Models ---
 class LoginRequest(BaseModel):
     username: str
     password: str
+
 
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     role: str
 
+
 class PredictionRequest(BaseModel):
     sku: str
+
 
 class PredictionResponse(BaseModel):
     sku: str
     timestamp: str
     predicted_price: float
+
 
 # --- App ---
 app = FastAPI()
@@ -68,9 +79,11 @@ HTTP_LATENCY = Histogram(
 
 GATEWAY_UP = Gauge("gateway_up", "Gateway up indicator (1=up)")
 
+
 @app.on_event("startup")
 def mark_up():
     GATEWAY_UP.set(1)
+
 
 # Middleware to record request count & latency
 @app.middleware("http")
@@ -78,7 +91,11 @@ async def metrics_middleware(request: Request, call_next):
     start = time.perf_counter()
 
     # Use templated route path when available to avoid high cardinality
-    path = request.scope.get("route").path if request.scope.get("route") else request.url.path
+    path = (
+        request.scope.get("route").path
+        if request.scope.get("route")
+        else request.url.path
+    )
     method = request.method
 
     try:
@@ -101,11 +118,13 @@ async def metrics_middleware(request: Request, call_next):
             # Never let metrics break the request path
             pass
 
+
 # --- Utility functions ---
 def create_jwt(username: str, role: str) -> str:
     expire = datetime.now(timezone.utc) + timedelta(minutes=JWT_EXPIRE_MINUTES)
     to_encode = {"sub": username, "role": role, "exp": expire}
     return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
 
 def decode_jwt(token: str):
     try:
@@ -116,13 +135,17 @@ def decode_jwt(token: str):
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
+
 def get_current_user_role(request: Request) -> str:
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+        raise HTTPException(
+            status_code=401, detail="Missing or invalid Authorization header"
+        )
     token = auth_header.split(" ")[1]
     payload = decode_jwt(token)
     return payload.get("role", "")
+
 
 # --- Routes ---
 @app.post("/login", response_model=LoginResponse)
@@ -133,6 +156,7 @@ def login(req: LoginRequest):
     role = ROLES[username]
     token = create_jwt(username, role)
     return LoginResponse(access_token=token, role=role)
+
 
 @app.post("/predict", response_model=PredictionResponse)
 async def predict(req: PredictionRequest, request: Request):
@@ -154,6 +178,7 @@ async def predict(req: PredictionRequest, request: Request):
         except httpx.RequestError:
             raise HTTPException(status_code=503, detail="Inference service unavailable")
 
+
 @app.post("/reload-model")
 async def reload_model(request: Request):
     role = get_current_user_role(request)
@@ -173,15 +198,19 @@ async def reload_model(request: Request):
         except httpx.RequestError:
             raise HTTPException(status_code=503, detail="Inference service unavailable")
 
+
 @app.get("/health")
 def health():
     return {"status": "OK", "service": "gateway"}
+
 
 # Prometheus scrape endpoint
 @app.get("/metrics")
 def metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("gateway.app:app", host="0.0.0.0", port=8002, reload=True)

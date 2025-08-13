@@ -36,7 +36,6 @@ def read_yaml(path_to_yaml: Path) -> ConfigBox:
 
 
 def create_directories(paths: List[Path]) -> None:
-
     """
     Crée une liste de répertoires si absents.
 

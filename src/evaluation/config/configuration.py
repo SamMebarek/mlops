@@ -4,6 +4,7 @@ from evaluation.entity.config_entity import EvaluationConfig
 from evaluation.utils.common import read_yaml, create_directories
 
 # Logger
+
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )

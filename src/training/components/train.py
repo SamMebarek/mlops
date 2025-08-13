@@ -9,8 +9,8 @@ from pathlib import Path
 from typing import Optional
 from datetime import datetime, timezone
 import subprocess  # <-- [NOUVEAU] pour récupérer le SHA git
-import hashlib     # <-- [NOUVEAU] fallback hash local
-import yaml        # <-- [NOUVEAU] lire le .dvc si présent
+import hashlib  # <-- [NOUVEAU] fallback hash local
+import yaml  # <-- [NOUVEAU] lire le .dvc si présent
 
 import pandas as pd
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
@@ -42,14 +42,20 @@ PUSHGATEWAY_URL = os.getenv("PUSHGATEWAY_URL", "http://pushgateway:9091")
 PUSH_GROUPING = {"instance": os.getenv("INSTANCE", "local"), "service": "training"}
 
 
-def _push_metrics(status: int, duration_s: float, rows: int, r2: Optional[float], artifact_bytes: int) -> None:
+def _push_metrics(
+    status: int, duration_s: float, rows: int, r2: Optional[float], artifact_bytes: int
+) -> None:
     try:
         reg = CollectorRegistry()
         g_status = Gauge("job_status", "1=success,0=failure", registry=reg)
         g_dur = Gauge("job_duration_seconds", "Job wall time in seconds", registry=reg)
-        g_rows = Gauge("rows_processed_total", "Rows processed by the job", registry=reg)
+        g_rows = Gauge(
+            "rows_processed_total", "Rows processed by the job", registry=reg
+        )
         g_r2 = Gauge("train_r2_score", "R^2 on holdout set", registry=reg)
-        g_art = Gauge("model_artifact_size_bytes", "Size of saved model artifact", registry=reg)
+        g_art = Gauge(
+            "model_artifact_size_bytes", "Size of saved model artifact", registry=reg
+        )
 
         g_status.set(float(status))
         g_dur.set(float(duration_s))
@@ -58,7 +64,9 @@ def _push_metrics(status: int, duration_s: float, rows: int, r2: Optional[float]
             g_r2.set(float(r2))
         g_art.set(float(artifact_bytes))
 
-        push_to_gateway(PUSHGATEWAY_URL, job="training", grouping_key=PUSH_GROUPING, registry=reg)
+        push_to_gateway(
+            PUSHGATEWAY_URL, job="training", grouping_key=PUSH_GROUPING, registry=reg
+        )
         logger.info(
             f"Pushed metrics to Pushgateway ({PUSHGATEWAY_URL}) "
             f"status={status} duration_s={duration_s:.3f} rows={rows} r2={r2} artifact_bytes={artifact_bytes}"
@@ -81,7 +89,11 @@ def _unique_local_model_dir() -> Path:
     except Exception:
         pass
 
-    suffix = airflow_run_id or mlflow_run_id or datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    suffix = (
+        airflow_run_id
+        or mlflow_run_id
+        or datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    )
     return Path("models") / f"xgb_model_mlflow_{suffix}"
 
 
@@ -100,6 +112,7 @@ def _dir_size_bytes(p: Path) -> int:
 
 
 # ---------- [NOUVEAU] Utilitaires traçabilité données & code ----------
+
 
 def _dvc_version_for(data_file: Path) -> Optional[str]:
     """
@@ -140,10 +153,13 @@ def _git_sha() -> Optional[str]:
     Retourne le commit SHA git courant (ou None si indisponible).
     """
     try:
-        res = subprocess.run(["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True)
+        res = subprocess.run(
+            ["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True
+        )
         return res.stdout.strip()
     except Exception:
         return None
+
 
 # ---------------------------------------------------------------------
 
@@ -194,26 +210,44 @@ def run_training(config_path: str, params_path: str):
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=train_cfg.test_size, random_state=train_cfg.random_seed
         )
-        logger.info(f"Split data: train_shape={X_train.shape}, test_shape={X_test.shape}")
+        logger.info(
+            f"Split data: train_shape={X_train.shape}, test_shape={X_test.shape}"
+        )
 
         # Hyperparam space
         pdist = cm.params.training.param_dist
         param_dist = {
-            "n_estimators": randint(pdist["n_estimators_min"], pdist["n_estimators_max"]),
+            "n_estimators": randint(
+                pdist["n_estimators_min"], pdist["n_estimators_max"]
+            ),
             "learning_rate": uniform(
-                pdist["learning_rate_min"], pdist["learning_rate_max"] - pdist["learning_rate_min"]
+                pdist["learning_rate_min"],
+                pdist["learning_rate_max"] - pdist["learning_rate_min"],
             ),
             "max_depth": randint(pdist["max_depth_min"], pdist["max_depth_max"]),
-            "subsample": uniform(pdist["subsample_min"], pdist["subsample_max"] - pdist["subsample_min"]),
-            "colsample_bytree": uniform(
-                pdist["colsample_bytree_min"], pdist["colsample_bytree_max"] - pdist["colsample_bytree_min"]
+            "subsample": uniform(
+                pdist["subsample_min"], pdist["subsample_max"] - pdist["subsample_min"]
             ),
-            "gamma": uniform(pdist["gamma_min"], pdist["gamma_max"] - pdist["gamma_min"]),
+            "colsample_bytree": uniform(
+                pdist["colsample_bytree_min"],
+                pdist["colsample_bytree_max"] - pdist["colsample_bytree_min"],
+            ),
+            "gamma": uniform(
+                pdist["gamma_min"], pdist["gamma_max"] - pdist["gamma_min"]
+            ),
         }
 
-        xgb = XGBRegressor(objective="reg:squarederror", random_state=train_cfg.random_seed)
+        xgb = XGBRegressor(
+            objective="reg:squarederror", random_state=train_cfg.random_seed
+        )
         search = RandomizedSearchCV(
-            xgb, param_distributions=param_dist, n_iter=10, cv=3, verbose=1, n_jobs=-1, random_state=train_cfg.random_seed
+            xgb,
+            param_distributions=param_dist,
+            n_iter=10,
+            cv=3,
+            verbose=1,
+            n_jobs=-1,
+            random_state=train_cfg.random_seed,
         )
 
         # Train + log
@@ -243,7 +277,9 @@ def run_training(config_path: str, params_path: str):
             if local_model_dir.exists():
                 shutil.rmtree(local_model_dir)
 
-            signature = infer_signature(X_train, search.best_estimator_.predict(X_train))
+            signature = infer_signature(
+                X_train, search.best_estimator_.predict(X_train)
+            )
             mlflow.sklearn.save_model(
                 sk_model=search.best_estimator_,
                 path=str(local_model_dir),
@@ -282,7 +318,9 @@ def run_training(config_path: str, params_path: str):
             artifact_bytes = model_path.stat().st_size
         artifact_bytes += _dir_size_bytes(local_model_dir)
 
-        logger.info(f"Local MLflow dir: {local_model_dir} (size={_dir_size_bytes(local_model_dir)} bytes)")
+        logger.info(
+            f"Local MLflow dir: {local_model_dir} (size={_dir_size_bytes(local_model_dir)} bytes)"
+        )
         logger.info(f"Model saved locally at: {model_path}")
 
         status = 1
@@ -291,7 +329,13 @@ def run_training(config_path: str, params_path: str):
         raise
     finally:
         duration = time.perf_counter() - t0
-        _push_metrics(status=status, duration_s=duration, rows=rows, r2=r2, artifact_bytes=artifact_bytes)
+        _push_metrics(
+            status=status,
+            duration_s=duration,
+            rows=rows,
+            r2=r2,
+            artifact_bytes=artifact_bytes,
+        )
 
 
 if __name__ == "__main__":

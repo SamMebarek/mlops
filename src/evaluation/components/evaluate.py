@@ -8,9 +8,8 @@ import mlflow
 from dotenv import load_dotenv
 from evaluation.config.configuration import ConfigurationManager
 from evaluation.utils.common import save_json
+
 load_dotenv()
-
-
 
 
 # Logger configuration
