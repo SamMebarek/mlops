@@ -16,7 +16,6 @@ COPY src/inference/ ./inference/
 
 # 5. Copier la configuration et les éventuels fichiers .env
 COPY config/ ./config/
-COPY .env ./
 
 # 6. Variables pour logs non bufferisés
 ENV PYTHONUNBUFFERED=1
