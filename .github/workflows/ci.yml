@@ -32,8 +32,8 @@ jobs:
 
       # Si tu as un requirements.txt pour les libs partagées (hors grosses libs fragiles),
       # décommente la ligne suivante :
-      - name: Install project requirements (optional)
-        run: pip install -r requirements.txt
+      # - name: Install project requirements (optional)
+      #   run: pip install -r requirements.txt
 
       # --- Lint ---
       - name: Ruff
