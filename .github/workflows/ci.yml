@@ -30,21 +30,20 @@ jobs:
           pip install "numpy<2" "pandas==2.2.3"
           pip install pytest ruff black pyyaml
 
-      # Si tu as un requirements.txt pour les libs partagées (hors grosses libs fragiles),
-      # décommente la ligne suivante :
-      # - name: Install project requirements (optional)
-      #   run: pip install -r requirements.txt
+      # Dépendance requise par configuration.py
+      - name: Install extra deps for config
+        run: pip install python-box==7.2.0
 
-      # --- Lint ---
+      # Lint
       - name: Ruff
         run: ruff check . --fix
 
       - name: Black (check only)
         run: black --check .
 
-      # --- Tests ---
+      # Très important: racine du repo, pas src/
       - name: Set PYTHONPATH for tests
-        run: echo "PYTHONPATH=${GITHUB_WORKSPACE}/src" >> $GITHUB_ENV
+        run: echo "PYTHONPATH=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
 
       - name: Pytest
         run: pytest -q
