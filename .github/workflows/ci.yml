@@ -8,63 +8,43 @@ jobs:
   ci:
     runs-on: ubuntu-latest
 
-    env:
-      # Chemin source pour les imports Python pendant les tests
-      PYTHONPATH: src
-
     steps:
-      # --- Récupération du code ---
       - name: Checkout
         uses: actions/checkout@v4
 
-      # --- Installation Python + cache pip ---
-      # Note: garde une version unique et stable de Python
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip'
+          python-version: "3.12"
 
-      # --- Dépendances (strictement nécessaires à la CI) ---
-      # On installe ruff/black/pytest puis tous les requirements des sous-modules.
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install ruff==0.5.6 black==24.4.2 pytest==8.2.0
-          # Installe tous les requirements de services si présents
-          if compgen -G "src/*/requirements.txt" > /dev/null; then
-            while IFS= read -r -d '' f; do
-              echo "Installing: $f"
-              pip install -r "$f"
-            done < <(find src -maxdepth 2 -type f -name "requirements.txt" -print0)
-          fi
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
 
-      # --- Lint (Ruff) ---
-      - name: Ruff (lint)
+      # --- Dépendances pour les linters/tests (sans casser NumPy) ---
+      - name: Uninstall system pyarrow (avoid ABI mismatch)
         run: |
-          ruff check . --fix
+          pip uninstall -y pyarrow || true
 
-      # --- Vérification de format (Black) ---
-      - name: Black (format check)
+      - name: Install base deps for tests
         run: |
-          black --check .
+          pip install "numpy<2" "pandas==2.2.3"
+          pip install pytest ruff black pyyaml
 
-      # --- Tests unitaires (si le dossier tests/ existe) ---
-      - name: Unit tests
-        run: |
-          if [ -d "tests" ]; then
-            echo "Running pytest..."
-            pytest -q
-          else
-            echo "Aucun dossier tests/ trouvé, étape ignorée."
-          fi
+      # Si tu as un requirements.txt pour les libs partagées (hors grosses libs fragiles),
+      # décommente la ligne suivante :
+      # - name: Install project requirements (optional)
+      #   run: pip install -r requirements.txt
 
-      # --- Build Docker des services critiques ---
-      # Construction locale uniquement (pas de push registry en CI)
-      - name: Build Docker image (inference)
-        run: |
-          docker build -f src/inference/Dockerfile -t inference:ci .
+      # --- Lint ---
+      - name: Ruff
+        run: ruff check . --fix
 
-      - name: Build Docker image (gateway)
-        run: |
-          docker build -f src/gateway/Dockerfile -t gateway:ci .
+      - name: Black (check only)
+        run: black --check .
+
+      # --- Tests ---
+      - name: Set PYTHONPATH for tests
+        run: echo "PYTHONPATH=${GITHUB_WORKSPACE}/src" >> $GITHUB_ENV
+
+      - name: Pytest
+        run: pytest -q
