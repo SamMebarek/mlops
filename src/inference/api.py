@@ -16,7 +16,6 @@ from inference.service.prediction_service import (
 )
 from inference.entity.dto import PredictionResult
 
-# Prometheus
 from prometheus_client import (
     Counter,
     Histogram,
