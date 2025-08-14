@@ -29,6 +29,9 @@ jobs:
         run: |
           pip install "numpy<2" "pandas==2.2.3"
           pip install pytest ruff black pyyaml
+          pip install python-box==7.2.0
+          pip install prometheus-client==0.20.0
+          pip install joblib==1.4.2
 
       # Dépendance requise par configuration.py
       - name: Install extra deps for config
