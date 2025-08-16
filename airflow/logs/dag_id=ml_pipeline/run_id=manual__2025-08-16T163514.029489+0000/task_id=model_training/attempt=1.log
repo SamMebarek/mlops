@@ -1,0 +1,50 @@
+[2025-08-16T16:35:29.755+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ml_pipeline.model_training manual__2025-08-16T16:35:14.029489+00:00 [queued]>
+[2025-08-16T16:35:29.771+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ml_pipeline.model_training manual__2025-08-16T16:35:14.029489+00:00 [queued]>
+[2025-08-16T16:35:29.773+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-08-16T16:35:29.794+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): model_training> on 2025-08-16 16:35:14.029489+00:00
+[2025-08-16T16:35:29.799+0000] {standard_task_runner.py:60} INFO - Started process 203 to run task
+[2025-08-16T16:35:29.805+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'ml_pipeline', 'model_training', 'manual__2025-08-16T16:35:14.029489+00:00', '--job-id', '122', '--raw', '--subdir', 'DAGS_FOLDER/ml_pipeline.py', '--cfg-path', '/tmp/tmp2vjtdmuq']
+[2025-08-16T16:35:29.808+0000] {standard_task_runner.py:88} INFO - Job 122: Subtask model_training
+[2025-08-16T16:35:29.903+0000] {task_command.py:423} INFO - Running <TaskInstance: ml_pipeline.model_training manual__2025-08-16T16:35:14.029489+00:00 [running]> on host e9fdf47702ac
+[2025-08-16T16:35:30.051+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='sarah' AIRFLOW_CTX_DAG_ID='ml_pipeline' AIRFLOW_CTX_TASK_ID='model_training' AIRFLOW_CTX_EXECUTION_DATE='2025-08-16T16:35:14.029489+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-08-16T16:35:14.029489+00:00'
+[2025-08-16T16:36:03.809+0000] {logging_mixin.py:188} INFO - STDOUT:
+[2025-08-16T16:36:03.810+0000] {logging_mixin.py:188} INFO -  Fitting 3 folds for each of 10 candidates, totalling 30 fits
+🏃 View run XGBoost_RandSearch at: https://dagshub.com/SamMebarek/mlops-som.mlflow/#/experiments/0/runs/dea37f9efea84e2bba32252ff6828e2a
+🧪 View experiment at: https://dagshub.com/SamMebarek/mlops-som.mlflow/#/experiments/0
+[2025-08-16T16:36:03.810+0000] {logging_mixin.py:188} INFO - STDERR:
+[2025-08-16T16:36:03.811+0000] {logging_mixin.py:188} INFO -  2025-08-16 16:35:33,637 - training.utils.common - INFO - YAML chargé : /opt/***/project/config/config.yaml
+2025-08-16 16:35:33,645 - training.utils.common - INFO - YAML chargé : /opt/***/project/config/params.yaml
+2025-08-16 16:35:33,646 - training.utils.common - INFO - Répertoire créé ou existant : /opt/***/project/models
+2025-08-16 16:35:33,647 - training.utils.common - INFO - Répertoire créé ou existant : /opt/***/project/models
+2025-08-16 16:35:34,485 - __main__ - INFO - Loaded processed data: /opt/***/project/data/processed/clean_data.csv (shape=(108060, 14))
+2025-08-16 16:35:35,099 - __main__ - INFO - Split data: train_shape=(86448, 11), test_shape=(21612, 11)
+2025/08/16 16:35:35 WARNING mlflow.utils.git_utils: Failed to import Git (the Git executable is probably not on your PATH), so Git SHA is not available. Error: Failed to initialize: Bad git executable.
+The git executable must be specified in one of the following ways:
+    - be included in your $PATH
+    - be set via $GIT_PYTHON_GIT_EXECUTABLE
+    - explicitly set via git.refresh(<full-path-to-git-executable>)
+
+All git commands will error until this is rectified.
+
+This initial message can be silenced or aggravated in the future by setting the
+$GIT_PYTHON_REFRESH environment variable. Use one of the following values:
+    - quiet|q|silence|s|silent|none|n|0: for no message or exception
+    - warn|w|warning|log|l|1: for a warning message (logging level CRITICAL, displayed by default)
+    - error|e|exception|raise|r|2: for a raised exception
+
+Example:
+    export GIT_PYTHON_REFRESH=quiet
+
+2025-08-16 16:35:35,543 - __main__ - INFO - Starting hyperparameter search and training.
+2025-08-16 16:35:49,274 - __main__ - INFO - Best params: {'colsample_bytree': 0.9219644132807024, 'gamma': 0.06692515264078093, 'learning_rate': 0.19307895078298942, 'max_depth': 5, 'n_estimators': 86, 'subsample': 0.6271914913054505}
+2025-08-16 16:35:49,274 - __main__ - INFO - R^2 score: 0.9998
+2025/08/16 16:36:02 INFO mlflow.store.model_registry.abstract_store: Waiting up to 300 seconds for model version to finish creation. Model name: PriceFixerModel, version 60
+2025-08-16 16:36:02,103 - __main__ - INFO - Registered model 'PriceFixerModel' from source=mlflow-artifacts:/4829b4e5ce254fea8f678e40a4133671/dea37f9efea84e2bba32252ff6828e2a/artifacts/xgb_model, run_id=dea37f9efea84e2bba32252ff6828e2a
+2025-08-16 16:36:02,512 - training.repository.repository - INFO - Modèle sauvegardé → /opt/***/project/models/xgb_model.pkl
+2025-08-16 16:36:02,547 - __main__ - INFO - Local MLflow dir: models/xgb_model_mlflow_manual__2025-08-16T16:35:14.029489+00:00 (size=244004 bytes)
+2025-08-16 16:36:02,547 - __main__ - INFO - Model saved locally at: /opt/***/project/models/xgb_model.pkl
+2025-08-16 16:36:02,551 - __main__ - INFO - Pushed metrics to Pushgateway (http://pushgateway:9091) status=1 duration_s=28.924 rows=108060 r2=0.9997696380635521 artifact_bytes=484994
+[2025-08-16T16:36:03.811+0000] {python.py:201} INFO - Done. Returned value was: None
+[2025-08-16T16:36:03.824+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=ml_pipeline, task_id=model_training, execution_date=20250816T163514, start_date=20250816T163529, end_date=20250816T163603
+[2025-08-16T16:36:03.885+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2025-08-16T16:36:03.920+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

@@ -1,0 +1,14 @@
+[2025-08-16T16:32:18.707+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ml_pipeline.reload_model manual__2025-08-16T16:30:59.177189+00:00 [queued]>
+[2025-08-16T16:32:18.726+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ml_pipeline.reload_model manual__2025-08-16T16:30:59.177189+00:00 [queued]>
+[2025-08-16T16:32:18.727+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-08-16T16:32:18.756+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): reload_model> on 2025-08-16 16:30:59.177189+00:00
+[2025-08-16T16:32:18.764+0000] {standard_task_runner.py:60} INFO - Started process 2523 to run task
+[2025-08-16T16:32:18.770+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'ml_pipeline', 'reload_model', 'manual__2025-08-16T16:30:59.177189+00:00', '--job-id', '118', '--raw', '--subdir', 'DAGS_FOLDER/ml_pipeline.py', '--cfg-path', '/tmp/tmpc03dg9mj']
+[2025-08-16T16:32:18.775+0000] {standard_task_runner.py:88} INFO - Job 118: Subtask reload_model
+[2025-08-16T16:32:18.865+0000] {task_command.py:423} INFO - Running <TaskInstance: ml_pipeline.reload_model manual__2025-08-16T16:30:59.177189+00:00 [running]> on host e9fdf47702ac
+[2025-08-16T16:32:18.971+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='sarah' AIRFLOW_CTX_DAG_ID='ml_pipeline' AIRFLOW_CTX_TASK_ID='reload_model' AIRFLOW_CTX_EXECUTION_DATE='2025-08-16T16:30:59.177189+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-08-16T16:30:59.177189+00:00'
+[2025-08-16T16:32:22.072+0000] {logging_mixin.py:188} INFO - Reload response: {'message': 'Model reloaded successfully'}
+[2025-08-16T16:32:22.073+0000] {python.py:201} INFO - Done. Returned value was: None
+[2025-08-16T16:32:22.089+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=ml_pipeline, task_id=reload_model, execution_date=20250816T163059, start_date=20250816T163218, end_date=20250816T163222
+[2025-08-16T16:32:22.122+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2025-08-16T16:32:22.143+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

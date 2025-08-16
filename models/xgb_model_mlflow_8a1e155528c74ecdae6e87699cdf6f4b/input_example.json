@@ -1,0 +1,1 @@
+{"columns": ["PrixInitial", "AgeProduitEnJours", "QuantiteVendue", "UtiliteProduit", "ElasticitePrix", "Remise", "Qualite", "Mois_sin", "Mois_cos", "Heure_sin", "Heure_cos"], "data": [[391.75709912229854, 154.0, 0.0, -16.305513317060193, 0.0524835664136574, 0.0, 0.4951769101112702, -2.4492935982947064e-16, 1.0, 0.0, 1.0]]}

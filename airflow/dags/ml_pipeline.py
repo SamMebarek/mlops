@@ -121,10 +121,10 @@ def run_evidently_batch():
         CURRENT_CSV,
         "--reference",
         REFERENCE_CSV,
-        # Optionally, pass pushgateway via env PUSHGATEWAY_URL
-        # "--pushgateway", os.getenv("PUSHGATEWAY_URL", "http://pushgateway:9091"),
+        "--pushgateway",
+        "http://pushgateway:9091",  # <— service Docker interne
         "--instance",
-        os.getenv("INSTANCE", "airflow"),
+        "local",  # <— aligne avec le dashboard
     ]
     res = subprocess.run(
         cmd,
