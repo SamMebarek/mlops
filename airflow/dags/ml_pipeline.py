@@ -65,6 +65,11 @@ def run_preprocessing():
 
 
 def run_training():
+    env = {
+        **os.environ,
+        "PYTHONPATH": SRC_DIR,
+        "MLFLOW_TRACKING_URI": "file:/opt/airflow/project/mlruns",
+    }  # ⬅️ fallback local
     res = subprocess.run(
         [
             sys.executable,
@@ -76,7 +81,7 @@ def run_training():
             PARAMS_PATH,
         ],
         cwd=SRC_DIR,
-        env={**os.environ, "PYTHONPATH": SRC_DIR},
+        env=env,
         capture_output=True,
         text=True,
     )

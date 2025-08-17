@@ -65,6 +65,7 @@ services:
     volumes:
       - ./config:/app/config
       - ./data/processed:/app/data/processed
+      - ./mlruns:/app/mlruns
     networks:
       - mlops_net
  

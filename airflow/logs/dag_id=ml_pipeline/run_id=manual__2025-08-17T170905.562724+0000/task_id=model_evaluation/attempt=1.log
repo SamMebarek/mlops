@@ -1,0 +1,45 @@
+[2025-08-17T17:10:11.632+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ml_pipeline.model_evaluation manual__2025-08-17T17:09:05.562724+00:00 [queued]>
+[2025-08-17T17:10:11.646+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ml_pipeline.model_evaluation manual__2025-08-17T17:09:05.562724+00:00 [queued]>
+[2025-08-17T17:10:11.647+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-08-17T17:10:11.671+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): model_evaluation> on 2025-08-17 17:09:05.562724+00:00
+[2025-08-17T17:10:11.681+0000] {standard_task_runner.py:60} INFO - Started process 296 to run task
+[2025-08-17T17:10:11.687+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'ml_pipeline', 'model_evaluation', 'manual__2025-08-17T17:09:05.562724+00:00', '--job-id', '150', '--raw', '--subdir', 'DAGS_FOLDER/ml_pipeline.py', '--cfg-path', '/tmp/tmpihuqh6sp']
+[2025-08-17T17:10:11.691+0000] {standard_task_runner.py:88} INFO - Job 150: Subtask model_evaluation
+[2025-08-17T17:10:11.783+0000] {task_command.py:423} INFO - Running <TaskInstance: ml_pipeline.model_evaluation manual__2025-08-17T17:09:05.562724+00:00 [running]> on host e9fdf47702ac
+[2025-08-17T17:10:11.914+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='sarah' AIRFLOW_CTX_DAG_ID='ml_pipeline' AIRFLOW_CTX_TASK_ID='model_evaluation' AIRFLOW_CTX_EXECUTION_DATE='2025-08-17T17:09:05.562724+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-08-17T17:09:05.562724+00:00'
+[2025-08-17T17:10:19.895+0000] {logging_mixin.py:188} INFO - STDOUT:
+[2025-08-17T17:10:19.896+0000] {logging_mixin.py:188} INFO -  🏃 View run thundering-flea-564 at: https://dagshub.com/SamMebarek/mlops-som.mlflow/#/experiments/0/runs/d67f0590e69046ebac4083f502e24ca0
+🧪 View experiment at: https://dagshub.com/SamMebarek/mlops-som.mlflow/#/experiments/0
+Evaluation completed. R2: 0.9998, MAE: 1.1356
+[2025-08-17T17:10:19.897+0000] {logging_mixin.py:188} INFO - STDERR:
+[2025-08-17T17:10:19.899+0000] {logging_mixin.py:188} INFO -  2025-08-17 17:10:16,837 - evaluation.utils.common - INFO - YAML chargé : /opt/***/project/config/config.yaml
+2025-08-17 17:10:16,845 - evaluation.utils.common - INFO - YAML chargé : /opt/***/project/config/params.yaml
+2025-08-17 17:10:16,850 - evaluation.utils.common - INFO - Répertoire créé ou existant : /opt/***/project/evaluation
+2025-08-17 17:10:17,787 - __main__ - INFO - Loaded processed data: /opt/***/project/data/processed/clean_data.csv (shape=(108060, 14))
+2025-08-17 17:10:17,888 - __main__ - INFO - Loaded model: /opt/***/project/models/xgb_model.pkl
+2025-08-17 17:10:18,001 - __main__ - INFO - Computed metrics: {'r2_score': 0.9997932180824073, 'mae': 1.135571365098727}
+2025-08-17 17:10:18,002 - evaluation.utils.common - INFO - Répertoire créé ou existant : /opt/***/project/evaluation
+2025-08-17 17:10:18,006 - evaluation.utils.common - INFO - JSON sauvegardé : /opt/***/project/evaluation/scores.json
+2025-08-17 17:10:18,006 - __main__ - INFO - Metrics saved to: /opt/***/project/evaluation/scores.json
+2025/08/17 17:10:18 WARNING mlflow.utils.git_utils: Failed to import Git (the Git executable is probably not on your PATH), so Git SHA is not available. Error: Failed to initialize: Bad git executable.
+The git executable must be specified in one of the following ways:
+    - be included in your $PATH
+    - be set via $GIT_PYTHON_GIT_EXECUTABLE
+    - explicitly set via git.refresh(<full-path-to-git-executable>)
+
+All git commands will error until this is rectified.
+
+This initial message can be silenced or aggravated in the future by setting the
+$GIT_PYTHON_REFRESH environment variable. Use one of the following values:
+    - quiet|q|silence|s|silent|none|n|0: for no message or exception
+    - warn|w|warning|log|l|1: for a warning message (logging level CRITICAL, displayed by default)
+    - error|e|exception|raise|r|2: for a raised exception
+
+Example:
+    export GIT_PYTHON_REFRESH=quiet
+
+2025-08-17 17:10:18,999 - __main__ - INFO - Metrics logged to MLflow.
+[2025-08-17T17:10:19.900+0000] {python.py:201} INFO - Done. Returned value was: None
+[2025-08-17T17:10:19.921+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=ml_pipeline, task_id=model_evaluation, execution_date=20250817T170905, start_date=20250817T171011, end_date=20250817T171019
+[2025-08-17T17:10:19.984+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2025-08-17T17:10:20.055+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

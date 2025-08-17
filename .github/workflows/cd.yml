@@ -1,0 +1,52 @@
+name: CD
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, Windows]
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker login
+        shell: pwsh
+        run: |
+          docker logout || echo "ok"
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Pull images
+        shell: pwsh
+        run: |
+          docker compose -f docker-compose.yml pull
+
+      - name: Up services
+        shell: pwsh
+        env:
+          COMPOSE_PROJECT_NAME: mlops
+        run: |
+          docker compose -f docker-compose.yml up -d --remove-orphans
+
+      - name: Health checks
+        shell: pwsh
+        run: |
+          function Test-Http($url, $retries=20, $delay=5) {
+            for ($i=0; $i -lt $retries; $i++) {
+              try {
+                $r = Invoke-RestMethod -Uri $url -TimeoutSec 5
+                Write-Host "OK $url"
+                return 0
+              } catch {
+                Start-Sleep -Seconds $delay
+              }
+            }
+            throw "Fail $url"
+          }
+          Test-Http "http://localhost:8002/health"
+          Test-Http "http://localhost:8080/health"
+          Test-Http "http://localhost:9090/-/ready"
