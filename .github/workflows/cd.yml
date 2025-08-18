@@ -50,3 +50,6 @@ jobs:
           Test-Http "http://localhost:8002/health"
           Test-Http "http://localhost:8080/health"
           Test-Http "http://localhost:9090/-/ready"
+
+
+          
