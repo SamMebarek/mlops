@@ -10,37 +10,36 @@ jobs:
     runs-on: [self-hosted, Windows]
     timeout-minutes: 30
 
+    defaults:
+      run:
+        shell: powershell
+        working-directory: ${{ github.workspace }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Docker login
-        shell: pwsh
         run: |
-          docker logout || echo "ok"
+          docker logout 2>$null || echo "ok"
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Pull images
-        shell: pwsh
         run: |
-          docker compose -f docker-compose.yml pull
+          docker compose -f docker-compose.yml --project-name mlops pull
 
       - name: Up services
-        shell: pwsh
-        env:
-          COMPOSE_PROJECT_NAME: mlops
         run: |
-          docker compose -f docker-compose.yml up -d --remove-orphans
+          docker compose -f docker-compose.yml --project-name mlops up -d --remove-orphans --no-build
 
       - name: Health checks
-        shell: pwsh
         run: |
           function Test-Http($url, $retries=20, $delay=5) {
             for ($i=0; $i -lt $retries; $i++) {
               try {
                 $r = Invoke-RestMethod -Uri $url -TimeoutSec 5
                 Write-Host "OK $url"
-                return 0
+                return
               } catch {
                 Start-Sleep -Seconds $delay
               }
@@ -51,5 +50,8 @@ jobs:
           Test-Http "http://localhost:8080/health"
           Test-Http "http://localhost:9090/-/ready"
 
-
-          
+      - name: Diagnostics (on failure)
+        if: failure()
+        run: |
+          docker compose -f docker-compose.yml --project-name mlops ps
+          docker compose -f docker-compose.yml --project-name mlops logs --no-color --tail=150
