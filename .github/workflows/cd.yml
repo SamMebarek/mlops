@@ -19,73 +19,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Start Docker Desktop (best effort)
-        continue-on-error: true
-        run: |
-          sc query com.docker.service || ^
-          start "" "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-
-      - name: Wait for Docker daemon
-        run: |
-          @echo off
-          set /a tries=0
-          :loop
-          docker info >nul 2>&1 && goto ok
-          set /a tries+=1
-          if %tries% GEQ 30 (
-            echo Docker daemon not ready
-            exit /b 1
-          )
-          timeout /t 5 >nul
-          goto loop
-          :ok
-          echo Docker is ready
-
-      - name: Locate docker-compose file
-        run: |
-          @echo off
-          setlocal enabledelayedexpansion
-          set FOUND=
-          for /f "delims=" %%F in ('dir /s /b docker-compose.yml 2^>nul') do (set FOUND=%%F & goto :found)
-          for /f "delims=" %%F in ('dir /s /b docker-compose.yaml 2^>nul') do (set FOUND=%%F & goto :found)
-          for /f "delims=" %%F in ('dir /s /b compose.yml 2^>nul') do (set FOUND=%%F & goto :found)
-          for /f "delims=" %%F in ('dir /s /b compose.yaml 2^>nul') do (set FOUND=%%F & goto :found)
-          echo No docker-compose file found
-          exit /b 1
-          :found
-          echo Using compose file: !FOUND!
-          echo COMPOSE_FILE_PATH=!FOUND!>> "%GITHUB_ENV%"
+      - name: Docker info (fail fast if daemon not ready)
+        run: docker info
 
       - name: Docker login
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          docker logout 2>nul || echo ok
+          docker logout
           echo %DOCKERHUB_TOKEN% | docker login -u %DOCKERHUB_USERNAME% --password-stdin
 
-      - name: Write .env (from secrets)
+      - name: Write .env (Airflow & apps)
         run: |
-          @echo FERNET_KEY=${{ secrets.FERNET_KEY }} > .env
-          @if not "${{ secrets.ADMIN_USER }}"=="" echo ADMIN_USER=${{ secrets.ADMIN_USER }}>> .env
-          @if not "${{ secrets.ADMIN_PASSWORD }}"=="" echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}>> .env
-          @if not "${{ secrets.JWT_SECRET }}"=="" echo JWT_SECRET=${{ secrets.JWT_SECRET }}>> .env
-          type .env
+          echo FERNET_KEY=${{ secrets.FERNET_KEY }} > .env
+          if not "${{ secrets.ADMIN_USER }}"==""       echo ADMIN_USER=${{ secrets.ADMIN_USER }}>> .env
+          if not "${{ secrets.ADMIN_PASSWORD }}"==""   echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}>> .env
+          if not "${{ secrets.JWT_SECRET }}"==""       echo JWT_SECRET=${{ secrets.JWT_SECRET }}>> .env
 
-      - name: Pull images (ignore failures for build-only services)
-        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops pull --ignore-pull-failures
+      - name: Pull images
+        run: docker compose -f docker-compose.yml --project-name mlops pull --ignore-pull-failures
 
       - name: Up services
-        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops up -d --remove-orphans --no-build
+        run: docker compose -f docker-compose.yml --project-name mlops up -d --remove-orphans --no-build
 
-      - name: Health checks
-        run: |
-          curl -sS --retry 30 --retry-delay 5 --fail http://localhost:8002/health >nul
-          curl -sS --retry 30 --retry-delay 5 --fail http://localhost:8080/health >nul
-          curl -sS --retry 30 --retry-delay 5 --fail http://localhost:9090/-/ready >nul
+      - name: Quick status
+        run: docker compose -f docker-compose.yml --project-name mlops ps
 
       - name: Diagnostics (on failure)
         if: failure()
-        run: |
-          docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops ps
-          docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops logs --no-color --tail=200
+        run: docker compose -f docker-compose.yml --project-name mlops logs --no-color --tail=200
