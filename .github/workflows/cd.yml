@@ -19,6 +19,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Locate docker-compose file
+        run: |
+          @echo off
+          setlocal enabledelayedexpansion
+          set FOUND=
+          for /f "delims=" %%F in ('dir /s /b docker-compose.yml 2^>nul') do (set FOUND=%%F & goto :found)
+          for /f "delims=" %%F in ('dir /s /b docker-compose.yaml 2^>nul') do (set FOUND=%%F & goto :found)
+          for /f "delims=" %%F in ('dir /s /b compose.yml 2^>nul') do (set FOUND=%%F & goto :found)
+          for /f "delims=" %%F in ('dir /s /b compose.yaml 2^>nul') do (set FOUND=%%F & goto :found)
+          echo No docker-compose file found
+          exit /b 1
+          :found
+          echo Using compose file: !FOUND!
+          echo COMPOSE_FILE_PATH=!FOUND!>> "%GITHUB_ENV%"
+
       - name: Docker login
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -28,19 +43,19 @@ jobs:
           echo %DOCKERHUB_TOKEN% | docker login -u %DOCKERHUB_USERNAME% --password-stdin
 
       - name: Pull images
-        run: docker compose -f docker-compose.yml --project-name mlops pull
+        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops pull
 
       - name: Up services
-        run: docker compose -f docker-compose.yml --project-name mlops up -d --remove-orphans --no-build
+        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops up -d --remove-orphans --no-build
 
       - name: Health checks
         run: |
-          curl --retry 20 --retry-delay 5 --fail http://localhost:8002/health
-          curl --retry 20 --retry-delay 5 --fail http://localhost:8080/health
-          curl --retry 20 --retry-delay 5 --fail http://localhost:9090/-/ready
+          curl -sS --retry 20 --retry-delay 5 --fail http://localhost:8002/health >nul
+          curl -sS --retry 20 --retry-delay 5 --fail http://localhost:8080/health >nul
+          curl -sS --retry 20 --retry-delay 5 --fail http://localhost:9090/-/ready >nul
 
       - name: Diagnostics (on failure)
         if: failure()
         run: |
-          docker compose -f docker-compose.yml --project-name mlops ps
-          docker compose -f docker-compose.yml --project-name mlops logs --no-color --tail=150
+          docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops ps
+          docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops logs --no-color --tail=150
