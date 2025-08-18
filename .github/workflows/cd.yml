@@ -19,6 +19,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Start Docker Desktop (best effort)
+        continue-on-error: true
+        run: |
+          sc query com.docker.service || ^
+          start "" "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+
+      - name: Wait for Docker daemon
+        run: |
+          @echo off
+          set /a tries=0
+          :loop
+          docker info >nul 2>&1 && goto ok
+          set /a tries+=1
+          if %tries% GEQ 30 (
+            echo Docker daemon not ready
+            exit /b 1
+          )
+          timeout /t 5 >nul
+          goto loop
+          :ok
+          echo Docker is ready
+
       - name: Locate docker-compose file
         run: |
           @echo off
@@ -42,20 +64,28 @@ jobs:
           docker logout 2>nul || echo ok
           echo %DOCKERHUB_TOKEN% | docker login -u %DOCKERHUB_USERNAME% --password-stdin
 
-      - name: Pull images
-        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops pull
+      - name: Write .env (from secrets)
+        run: |
+          @echo FERNET_KEY=${{ secrets.FERNET_KEY }} > .env
+          @if not "${{ secrets.ADMIN_USER }}"=="" echo ADMIN_USER=${{ secrets.ADMIN_USER }}>> .env
+          @if not "${{ secrets.ADMIN_PASSWORD }}"=="" echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}>> .env
+          @if not "${{ secrets.JWT_SECRET }}"=="" echo JWT_SECRET=${{ secrets.JWT_SECRET }}>> .env
+          type .env
+
+      - name: Pull images (ignore failures for build-only services)
+        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops pull --ignore-pull-failures
 
       - name: Up services
         run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops up -d --remove-orphans --no-build
 
       - name: Health checks
         run: |
-          curl -sS --retry 20 --retry-delay 5 --fail http://localhost:8002/health >nul
-          curl -sS --retry 20 --retry-delay 5 --fail http://localhost:8080/health >nul
-          curl -sS --retry 20 --retry-delay 5 --fail http://localhost:9090/-/ready >nul
+          curl -sS --retry 30 --retry-delay 5 --fail http://localhost:8002/health >nul
+          curl -sS --retry 30 --retry-delay 5 --fail http://localhost:8080/health >nul
+          curl -sS --retry 30 --retry-delay 5 --fail http://localhost:9090/-/ready >nul
 
       - name: Diagnostics (on failure)
         if: failure()
         run: |
           docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops ps
-          docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops logs --no-color --tail=150
+          docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops logs --no-color --tail=200
