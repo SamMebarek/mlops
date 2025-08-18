@@ -15,11 +15,24 @@ jobs:
         shell: cmd
         working-directory: ${{ github.workspace }}
 
+    env:
+      DOCKER_HOST: tcp://localhost:2375
+      COMPOSE_FILE_PATH: docker-compose.yml
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Docker info (fail fast if daemon not ready)
+      - name: Sanity checks
+        run: |
+          echo Repo at: %CD%
+          if not exist "%COMPOSE_FILE_PATH%" (
+            echo [ERREUR] Fichier compose introuvable: %COMPOSE_FILE_PATH%
+            dir /b /s docker-compose*.yml
+            exit /b 1
+          )
+
+      - name: Docker info
         run: docker info
 
       - name: Docker login
@@ -30,22 +43,63 @@ jobs:
           docker logout
           echo %DOCKERHUB_TOKEN% | docker login -u %DOCKERHUB_USERNAME% --password-stdin
 
-      - name: Write .env (Airflow & apps)
+      - name: Ecrire .env (min)
         run: |
-          echo FERNET_KEY=${{ secrets.FERNET_KEY }} > .env
-          if not "${{ secrets.ADMIN_USER }}"==""       echo ADMIN_USER=${{ secrets.ADMIN_USER }}>> .env
-          if not "${{ secrets.ADMIN_PASSWORD }}"==""   echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}>> .env
-          if not "${{ secrets.JWT_SECRET }}"==""       echo JWT_SECRET=${{ secrets.JWT_SECRET }}>> .env
+          > .env (
+            echo FERNET_KEY=${{ secrets.FERNET_KEY }}
+          )
+          if not "${{ secrets.ADMIN_USER }}"==""       ( echo ADMIN_USER=${{ secrets.ADMIN_USER }}>> .env )
+          if not "${{ secrets.ADMIN_PASSWORD }}"==""   ( echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}>> .env )
+          if not "${{ secrets.JWT_SECRET }}"==""       ( echo JWT_SECRET=${{ secrets.JWT_SECRET }}>> .env )
+          type .env
 
       - name: Pull images
-        run: docker compose -f docker-compose.yml --project-name mlops pull --ignore-pull-failures
+        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops pull --ignore-pull-failures
 
       - name: Up services
-        run: docker compose -f docker-compose.yml --project-name mlops up -d --remove-orphans --no-build
+        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops up -d --remove-orphans --no-build
 
-      - name: Quick status
-        run: docker compose -f docker-compose.yml --project-name mlops ps
+      - name: Status
+        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops ps
+
+      - name: Health check (gateway)
+        run: |
+          set URL=http://localhost:8002/health
+          for /l %%i in (1,1,30) do (
+            curl -s -m 5 "%URL%" && goto ok
+            timeout /t 5 >nul
+          )
+          echo FAIL %URL%
+          exit /b 1
+          :ok
+          echo OK %URL%
+
+      - name: Health check (inference)
+        run: |
+          set URL=http://localhost:8080/health
+          for /l %%i in (1,1,30) do (
+            curl -s -m 5 "%URL%" && goto ok
+            timeout /t 5 >nul
+          )
+          echo FAIL %URL%
+          exit /b 1
+          :ok
+          echo OK %URL%
+
+      - name: Health check (Prometheus)
+        run: |
+          set URL=http://localhost:9090/-/ready
+          for /l %%i in (1,1,30) do (
+            curl -s -m 5 "%URL%" && goto ok
+            timeout /t 5 >nul
+          )
+          echo FAIL %URL%
+          exit /b 1
+          :ok
+          echo OK %URL%
 
       - name: Diagnostics (on failure)
         if: failure()
-        run: docker compose -f docker-compose.yml --project-name mlops logs --no-color --tail=200
+        run: |
+          docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops ps
+          docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops logs --no-color --tail=200
