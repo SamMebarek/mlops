@@ -158,7 +158,6 @@ services:
 
   prometheus:
     image: prom/prometheus:v2.53.0
-    container_name: prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
@@ -174,7 +173,6 @@ services:
 
   pushgateway:
     image: prom/pushgateway:v1.7.0
-    container_name: pushgateway
     ports:
       - "9091:9091"
     networks:
@@ -182,7 +180,6 @@ services:
 
   grafana:
     image: grafana/grafana:10.4.3
-    container_name: grafana
     ports:
       - "3000:3000"
     networks:
