@@ -18,6 +18,7 @@ jobs:
     env:
       DOCKER_HOST: tcp://localhost:2375
       COMPOSE_FILE_PATH: docker-compose.yaml
+      COMPOSE_PROJECT_NAME: mlops
 
     steps:
       - name: Checkout
@@ -28,7 +29,7 @@ jobs:
           echo Repo at: %CD%
           if not exist "%COMPOSE_FILE_PATH%" (
             echo [ERREUR] Fichier compose introuvable: %COMPOSE_FILE_PATH%
-            dir /b /s docker-compose*.yml
+            dir /b /s docker-compose*.yaml
             exit /b 1
           )
 
@@ -51,16 +52,21 @@ jobs:
           if not "${{ secrets.ADMIN_USER }}"==""       ( echo ADMIN_USER=${{ secrets.ADMIN_USER }}>> .env )
           if not "${{ secrets.ADMIN_PASSWORD }}"==""   ( echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}>> .env )
           if not "${{ secrets.JWT_SECRET }}"==""       ( echo JWT_SECRET=${{ secrets.JWT_SECRET }}>> .env )
-          type .env
+
+      - name: Cleanup fixed container names
+        run: |
+          docker rm -f pushgateway  2>nul
+          docker rm -f grafana      2>nul
+          docker rm -f prometheus   2>nul
 
       - name: Pull images
-        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops pull --ignore-pull-failures
+        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% pull --ignore-pull-failures
 
       - name: Up services
-        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops up -d --remove-orphans --no-build
+        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% up -d --remove-orphans --no-build
 
       - name: Status
-        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops ps
+        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% ps
 
       - name: Health check (gateway)
         run: |
@@ -101,5 +107,5 @@ jobs:
       - name: Diagnostics (on failure)
         if: failure()
         run: |
-          docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops ps
-          docker compose -f "%COMPOSE_FILE_PATH%" --project-name mlops logs --no-color --tail=200
+          docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% ps
+          docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% logs --no-color --tail=200
