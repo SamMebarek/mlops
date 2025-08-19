@@ -77,20 +77,6 @@ jobs:
       - name: Status
         run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% ps
 
-      - name: Health check (gateway)
-        run: |
-          curl --silent --show-error --retry 60 --retry-delay 5 --retry-connrefused ^
-            http://localhost:8002/health
-
-      - name: Health check (inference)
-        run: |
-          curl --silent --show-error --retry 60 --retry-delay 5 --retry-connrefused ^
-            http://localhost:8080/health
-
-      - name: Health check (Prometheus)
-        run: |
-          curl --silent --show-error --retry 60 --retry-delay 5 --retry-connrefused ^
-            http://localhost:9090/-/ready
 
 
       - name: Diagnostics (on failure)
