@@ -17,7 +17,7 @@ jobs:
 
     env:
       DOCKER_HOST: tcp://localhost:2375
-      COMPOSE_FILE_PATH: docker-compose.yml
+      COMPOSE_FILE_PATH: docker-compose.yaml
       COMPOSE_PROJECT_NAME: mlops
 
     steps:
