@@ -16,7 +16,6 @@ jobs:
         working-directory: ${{ github.workspace }}
 
     env:
-      DOCKER_HOST: tcp://localhost:2375
       COMPOSE_FILE_PATH: docker-compose.yaml
       COMPOSE_PROJECT_NAME: mlops
 
@@ -29,7 +28,7 @@ jobs:
           echo Repo at: %CD%
           if not exist "%COMPOSE_FILE_PATH%" (
             echo [ERREUR] Fichier compose introuvable: %COMPOSE_FILE_PATH%
-            dir /b /s docker-compose*.yaml
+            dir /b /s docker-compose*.yml docker-compose*.yaml
             exit /b 1
           )
 
@@ -53,14 +52,16 @@ jobs:
           if not "${{ secrets.ADMIN_PASSWORD }}"==""   ( echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}>> .env )
           if not "${{ secrets.JWT_SECRET }}"==""       ( echo JWT_SECRET=${{ secrets.JWT_SECRET }}>> .env )
 
-      - name: Cleanup fixed container names
+      - name: Stop/clean previous project (safe)
         run: |
+          docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% down --remove-orphans
+          REM Cleanup legacy single-name containers that may collide
           docker rm -f pushgateway  2>nul
           docker rm -f grafana      2>nul
           docker rm -f prometheus   2>nul
 
       - name: Pull images
-        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% pull --ignore-pull-failures
+        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% pull --ignore-pull-failures --include-deps
 
       - name: Up services
         run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% up -d --remove-orphans --no-build

@@ -1,10 +1,6 @@
-
 services:
   ingestion:
     image: samdataiken/ingestion-service:dev
-    build:
-      context: .
-      dockerfile: src/ingestion/Dockerfile
     volumes:
       - ./config:/app/config
       - ./data/ingestion:/app/data/ingestion
@@ -14,9 +10,6 @@ services:
 
   preprocessing:
     image: samdataiken/preprocessing-service:dev
-    build:
-      context: .
-      dockerfile: src/preprocessing/Dockerfile
     volumes:
       - ./config:/app/config
       - ./data/raw:/app/data/raw
@@ -26,9 +19,6 @@ services:
 
   training:
     image: samdataiken/training-service:dev
-    build:
-      context: .
-      dockerfile: src/training/Dockerfile
     env_file:
       - .env
     volumes:
@@ -40,9 +30,6 @@ services:
 
   evaluation:
     image: samdataiken/evaluation-service:dev
-    build:
-      context: .
-      dockerfile: src/evaluation/Dockerfile
     env_file:
       - .env
     volumes:
@@ -55,9 +42,6 @@ services:
 
   inference:
     image: samdataiken/inference-service:dev
-    build:
-      context: .
-      dockerfile: src/inference/Dockerfile
     env_file:
       - .env
     ports:
@@ -68,11 +52,9 @@ services:
       - ./mlruns:/app/mlruns
     networks:
       - mlops_net
- 
+
   gateway:
-    build:
-      context: .
-      dockerfile: src/gateway/Dockerfile
+    image: samdataiken/gateway-service:dev
     env_file:
       - .env
     ports:
@@ -81,7 +63,6 @@ services:
       - mlops_net
     depends_on:
       - inference
-
 
   postgres:
     image: postgres:13
@@ -96,9 +77,7 @@ services:
       - mlops_net
 
   airflow-webserver:
-    build:
-      context: .
-      dockerfile: airflow/Dockerfile.airflow
+    image: samdataiken/airflow-webserver:dev
     env_file:
       - .env
     restart: always
@@ -129,9 +108,7 @@ services:
       "
 
   airflow-scheduler:
-    build:
-      context: .
-      dockerfile: airflow/Dockerfile.airflow
+    image: samdataiken/airflow-scheduler:dev
     env_file:
       - .env
     restart: always
@@ -154,7 +131,6 @@ services:
       airflow db upgrade &&
       airflow scheduler
       "
-
 
   prometheus:
     image: prom/prometheus:v2.53.0
@@ -193,7 +169,6 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
-    
 
 volumes:
   postgres_db:
