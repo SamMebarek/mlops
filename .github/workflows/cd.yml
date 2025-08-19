@@ -79,39 +79,19 @@ jobs:
 
       - name: Health check (gateway)
         run: |
-          set URL=http://localhost:8002/health
-          for /l %%i in (1,1,30) do (
-            curl -s -m 5 "%URL%" && goto ok
-            timeout /t 5 >nul
-          )
-          echo FAIL %URL%
-          exit /b 1
-          :ok
-          echo OK %URL%
+          curl --silent --show-error --retry 60 --retry-delay 5 --retry-connrefused ^
+            http://localhost:8002/health
 
       - name: Health check (inference)
         run: |
-          set URL=http://localhost:8080/health
-          for /l %%i in (1,1,30) do (
-            curl -s -m 5 "%URL%" && goto ok
-            timeout /t 5 >nul
-          )
-          echo FAIL %URL%
-          exit /b 1
-          :ok
-          echo OK %URL%
+          curl --silent --show-error --retry 60 --retry-delay 5 --retry-connrefused ^
+            http://localhost:8080/health
 
       - name: Health check (Prometheus)
         run: |
-          set URL=http://localhost:9090/-/ready
-          for /l %%i in (1,1,30) do (
-            curl -s -m 5 "%URL%" && goto ok
-            timeout /t 5 >nul
-          )
-          echo FAIL %URL%
-          exit /b 1
-          :ok
-          echo OK %URL%
+          curl --silent --show-error --retry 60 --retry-delay 5 --retry-connrefused ^
+            http://localhost:9090/-/ready
+
 
       - name: Diagnostics (on failure)
         if: failure()
