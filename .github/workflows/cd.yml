@@ -13,10 +13,11 @@ jobs:
     defaults:
       run:
         shell: cmd
-        working-directory: ${{ github.workspace }}
+        working-directory: %GITHUB_WORKSPACE%
 
     env:
-      COMPOSE_FILE_PATH: docker-compose.yaml
+      DOCKER_HOST: tcp://localhost:2375
+      COMPOSE_FILE_PATH: docker-compose.yml
       COMPOSE_PROJECT_NAME: mlops
 
     steps:
@@ -32,7 +33,19 @@ jobs:
             exit /b 1
           )
 
-      - name: Docker info
+      - name: Check Docker API (_ping)
+        run: |
+          for /l %%i in (1,1,20) do (
+            curl -s http://localhost:2375/_ping | find "OK" >nul && goto ok
+            echo Attente Docker API...
+            timeout /t 3 >nul
+          )
+          echo [ERREUR] Docker API tcp://localhost:2375 indisponible
+          exit /b 1
+          :ok
+          echo Docker API OK
+
+      - name: Docker info (via DOCKER_HOST)
         run: docker info
 
       - name: Docker login
@@ -52,13 +65,8 @@ jobs:
           if not "${{ secrets.ADMIN_PASSWORD }}"==""   ( echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}>> .env )
           if not "${{ secrets.JWT_SECRET }}"==""       ( echo JWT_SECRET=${{ secrets.JWT_SECRET }}>> .env )
 
-      - name: Stop/clean previous project (safe)
-        run: |
-          docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% down --remove-orphans
-          REM Cleanup legacy single-name containers that may collide
-          docker rm -f pushgateway  2>nul
-          docker rm -f grafana      2>nul
-          docker rm -f prometheus   2>nul
+      - name: Down (nettoyage sûr)
+        run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% down --remove-orphans
 
       - name: Pull images
         run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% pull --ignore-pull-failures --include-deps
