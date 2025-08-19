@@ -13,7 +13,7 @@ jobs:
     defaults:
       run:
         shell: cmd
-        working-directory: %GITHUB_WORKSPACE%
+        working-directory: ${{ github.workspace }}
 
     env:
       DOCKER_HOST: tcp://localhost:2375
