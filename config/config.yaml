@@ -1,7 +1,7 @@
 # config/config.yaml
 
 data_ingestion:
-  source_URL: "/opt/airflow/project/data/ingestion/donnees_synthetiques.csv"      # URL ou chemin local du CSV à ingérer
+  source_URL: "data/ingestion/donnees_synthetiques.csv"      # URL ou chemin local du CSV à ingérer
   raw_data_dir: "data/raw"                         # Dossier où stocker le CSV ingéré
   ingested_file_name: "ingested_data.csv"          # Nom du fichier ingéré
 
@@ -11,11 +11,8 @@ data_preprocessing:
   clean_file_name: "clean_data.csv"
 
 training:
-  # Where to read the preprocessed CSV
   processed_data_path: "data/processed/clean_data.csv"
-  # Where to write your trained model
   model_dir: "models"
-  # Filename for the serialized model
   model_file_name: "xgb_model.pkl"
 
 model_config:

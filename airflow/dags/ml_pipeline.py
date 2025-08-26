@@ -1,5 +1,4 @@
-#  airflow/dags/ml_pipeline.py
-
+# airflow/dags/ml_pipeline.py
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
@@ -31,7 +30,7 @@ if SRC_DIR not in sys.path:
 
 
 def run_ingestion():
-    subprocess.run(
+    res = subprocess.run(
         [
             sys.executable,
             "-m",
@@ -41,14 +40,19 @@ def run_ingestion():
             "--params",
             PARAMS_PATH,
         ],
-        check=True,
-        cwd=SRC_DIR,
+        cwd=PROJECT_ROOT,  # <<< clé: exécuter à la racine du projet
         env={**os.environ, "PYTHONPATH": SRC_DIR},
+        capture_output=True,
+        text=True,
     )
+    print("STDOUT:\n", res.stdout)
+    print("STDERR:\n", res.stderr)
+    if res.returncode != 0:
+        raise subprocess.CalledProcessError(res.returncode, res.args, res.stdout, res.stderr)
 
 
 def run_preprocessing():
-    subprocess.run(
+    res = subprocess.run(
         [
             sys.executable,
             "-m",
@@ -58,18 +62,24 @@ def run_preprocessing():
             "--params",
             PARAMS_PATH,
         ],
-        check=True,
-        cwd=SRC_DIR,
+        cwd=PROJECT_ROOT,
         env={**os.environ, "PYTHONPATH": SRC_DIR},
+        capture_output=True,
+        text=True,
     )
+    print("STDOUT:\n", res.stdout)
+    print("STDERR:\n", res.stderr)
+    if res.returncode != 0:
+        raise subprocess.CalledProcessError(res.returncode, res.args, res.stdout, res.stderr)
 
 
 def run_training():
     env = {
         **os.environ,
         "PYTHONPATH": SRC_DIR,
-        "MLFLOW_TRACKING_URI": "file:/opt/airflow/project/mlruns",
-    }  # ⬅️ fallback local
+        # Fallback local si aucun tracking distant n'est fourni
+        "MLFLOW_TRACKING_URI": os.getenv("MLFLOW_TRACKING_URI", "file:/opt/airflow/project/mlruns"),
+    }
     res = subprocess.run(
         [
             sys.executable,
@@ -80,7 +90,7 @@ def run_training():
             "--params",
             PARAMS_PATH,
         ],
-        cwd=SRC_DIR,
+        cwd=PROJECT_ROOT,
         env=env,
         capture_output=True,
         text=True,
@@ -102,7 +112,7 @@ def run_evaluation():
             "--params",
             PARAMS_PATH,
         ],
-        cwd=SRC_DIR,
+        cwd=PROJECT_ROOT,
         env={**os.environ, "PYTHONPATH": SRC_DIR},
         capture_output=True,
         text=True,
@@ -127,9 +137,9 @@ def run_evidently_batch():
         "--reference",
         REFERENCE_CSV,
         "--pushgateway",
-        "http://pushgateway:9091",  # <— service Docker interne
+        "http://pushgateway:9091",  # service docker interne
         "--instance",
-        "local",  # <— aligne avec le dashboard
+        os.getenv("EVIDENTLY_INSTANCE", "local"),
     ]
     res = subprocess.run(
         cmd,
@@ -171,7 +181,7 @@ default_args = {
 with DAG(
     dag_id="ml_pipeline",
     default_args=default_args,
-    schedule_interval=None,  # manual for now
+    schedule_interval=None,  # manuel pour l'instant
     catchup=False,
     description="Rakuten ML pipeline orchestrated by Airflow",
     tags=["ml", "rakuten", "xgboost"],
@@ -202,7 +212,6 @@ with DAG(
         python_callable=run_evidently_batch,
     )
 
-    # Optional: flip to False to disable reload in DAG without code edits
     if os.getenv("RELOAD_AFTER_TRAIN", "true").lower() == "true":
         task_reload = PythonOperator(
             task_id="reload_model",

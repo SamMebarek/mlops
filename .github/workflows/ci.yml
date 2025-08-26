@@ -20,7 +20,6 @@ jobs:
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
 
-      # --- Dépendances pour les linters/tests (sans casser NumPy) ---
       - name: Uninstall system pyarrow (avoid ABI mismatch)
         run: |
           pip uninstall -y pyarrow || true
@@ -33,7 +32,6 @@ jobs:
           pip install prometheus-client==0.20.0
           pip install joblib==1.4.2
 
-      # Dépendance requise par configuration.py
       - name: Install extra deps for config
         run: pip install python-box==7.2.0
 
@@ -44,7 +42,6 @@ jobs:
       - name: Black (check only)
         run: black --check .
 
-      # Très important: racine du repo, pas src/
       - name: Set PYTHONPATH for tests
         run: echo "PYTHONPATH=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
 

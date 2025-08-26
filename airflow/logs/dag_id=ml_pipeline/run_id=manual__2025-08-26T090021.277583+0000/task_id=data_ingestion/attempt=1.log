@@ -1,0 +1,25 @@
+[2025-08-26T09:00:23.018+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ml_pipeline.data_ingestion manual__2025-08-26T09:00:21.277583+00:00 [queued]>
+[2025-08-26T09:00:23.064+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ml_pipeline.data_ingestion manual__2025-08-26T09:00:21.277583+00:00 [queued]>
+[2025-08-26T09:00:23.074+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-08-26T09:00:23.176+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): data_ingestion> on 2025-08-26 09:00:21.277583+00:00
+[2025-08-26T09:00:23.215+0000] {standard_task_runner.py:60} INFO - Started process 199 to run task
+[2025-08-26T09:00:23.232+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'ml_pipeline', 'data_ingestion', 'manual__2025-08-26T09:00:21.277583+00:00', '--job-id', '177', '--raw', '--subdir', 'DAGS_FOLDER/ml_pipeline.py', '--cfg-path', '/tmp/tmp6wj0i126']
+[2025-08-26T09:00:23.242+0000] {standard_task_runner.py:88} INFO - Job 177: Subtask data_ingestion
+[2025-08-26T09:00:23.513+0000] {task_command.py:423} INFO - Running <TaskInstance: ml_pipeline.data_ingestion manual__2025-08-26T09:00:21.277583+00:00 [running]> on host 1729dc9a5378
+[2025-08-26T09:00:23.945+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='sarah' AIRFLOW_CTX_DAG_ID='ml_pipeline' AIRFLOW_CTX_TASK_ID='data_ingestion' AIRFLOW_CTX_EXECUTION_DATE='2025-08-26T09:00:21.277583+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-08-26T09:00:21.277583+00:00'
+[2025-08-26T09:00:31.733+0000] {logging_mixin.py:188} INFO - STDOUT:
+[2025-08-26T09:00:31.734+0000] {logging_mixin.py:188} INFO -  
+[2025-08-26T09:00:31.735+0000] {logging_mixin.py:188} INFO - STDERR:
+[2025-08-26T09:00:31.735+0000] {logging_mixin.py:188} INFO -  2025-08-26 09:00:26,925 - ingestion.utils.common - INFO - YAML chargé : /opt/***/project/config/config.yaml
+2025-08-26 09:00:26,934 - ingestion.utils.common - INFO - YAML chargé : /opt/***/project/config/params.yaml
+2025-08-26 09:00:26,935 - ingestion.utils.common - INFO - Répertoire créé ou existant : data
+2025-08-26 09:00:26,937 - ingestion.utils.common - INFO - Répertoire créé ou existant : data/raw
+2025-08-26 09:00:27,525 - __main__ - INFO - CSV lu localement : data/ingestion/donnees_synthetiques.csv
+2025-08-26 09:00:27,529 - __main__ - INFO - Validation du schéma réussie.
+2025-08-26 09:00:30,804 - ingestion.repository.repository - INFO - Persistance CSV effectuée → data/raw/ingested_data.csv
+2025-08-26 09:00:31,570 - __main__ - INFO - Fichier ingéré (CSV) sauvegardé : data/raw/ingested_data.csv (MD5=45b08e97bd4999fecedda7b95bca5564)
+2025-08-26 09:00:31,576 - __main__ - INFO - Pushed metrics to Pushgateway (http://pushgateway:9091) status=1 duration_s=4.653 rows=108060 out_bytes=25352322
+[2025-08-26T09:00:31.736+0000] {python.py:201} INFO - Done. Returned value was: None
+[2025-08-26T09:00:31.747+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=ml_pipeline, task_id=data_ingestion, execution_date=20250826T090021, start_date=20250826T090023, end_date=20250826T090031
+[2025-08-26T09:00:31.792+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2025-08-26T09:00:31.825+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

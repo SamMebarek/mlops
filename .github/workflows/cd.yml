@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Sanity checks
+      - name: checks
         run: |
           echo Repo at: %CD%
           if not exist "%COMPOSE_FILE_PATH%" (
@@ -65,7 +65,7 @@ jobs:
           if not "${{ secrets.ADMIN_PASSWORD }}"==""   ( echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}>> .env )
           if not "${{ secrets.JWT_SECRET }}"==""       ( echo JWT_SECRET=${{ secrets.JWT_SECRET }}>> .env )
 
-      - name: Down (nettoyage sûr)
+      - name: Down
         run: docker compose -f "%COMPOSE_FILE_PATH%" --project-name %COMPOSE_PROJECT_NAME% down --remove-orphans
 
       - name: Pull images
