@@ -138,20 +138,6 @@ Réponse :
 { "status": "OK", "service": "gateway" }
 ```
 
-### Prédire un prix
-
-```bash
-curl -X POST http://localhost:8002/predict \
-  -H "Content-Type: application/json" \
-  -d '{"sku": "SKU1_1"}'
-```
-
-### Recharger le modèle
-
-```bash
-curl -X POST http://localhost:8002/reload-model
-```
-
 ---
 
 ## 📊 Monitoring
@@ -160,7 +146,6 @@ curl -X POST http://localhost:8002/reload-model
 * **Pushgateway** → [http://localhost:9091](http://localhost:9091)
 * **Grafana** → [http://localhost:3000](http://localhost:3000)
 
-Dashboards Grafana auto-provisionnés via `/grafana/provisioning`.
 
 ---
 
