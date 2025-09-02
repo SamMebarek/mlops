@@ -43,24 +43,6 @@ Côté technique, c’est une chaîne **MLOps complète** :
 Les variables sensibles sont définies dans un fichier `.env` **non versionné**.  
 Un exemple est fourni : [`.env.example`](.env.example).  
 
-- **Mode local (par défaut)** :  
-  ```env
-  # MLflow local
-  MLFLOW_TRACKING_URI=file:/opt/airflow/project/mlruns
-  FERNET_KEY=xxxxx
-  ADMIN_USER=admin
-  ADMIN_PASSWORD=admin
-
-* **Mode Dagshub (optionnel)** :
-  Remplacez par vos credentials personnels :
-
-  ```env
-  AWS_ACCESS_KEY_ID=xxx
-  AWS_SECRET_ACCESS_KEY=xxx
-  MLFLOW_TRACKING_URI=https://dagshub.com/<username>/<repo>.mlflow
-  ```
-
-⚠️ Chaque utilisateur doit créer **son propre compte Dagshub** s’il veut stocker modèles et métriques en ligne.
 
 ---
 
@@ -83,14 +65,13 @@ cp .env.example .env
 # Lancer la stack Docker
 docker compose up -d
 
-# (Optionnel) Frontend Streamlit
-sudo apt install python3-pip -y
-pip install streamlit
-export PATH=$PATH:/home/ubuntu/.local/bin
-streamlit run src/frontend/app.py
 ```
 
+
+
 ### Windows
+
+Ouvrez Docker Desktop.
 
 ```powershell
 git clone --branch soutenance --single-branch https://github.com/SamMebarek/mlops.git
@@ -102,14 +83,17 @@ copy .env.example .env
 # Lancer Docker
 docker compose up -d
 
-# (Optionnel) Frontend Streamlit
-pip install streamlit
-streamlit run src/frontend/app.py
 ```
 
----
-
 ## 🛠️ Pipeline Airflow
+
+👉 Accès UI Airflow : [http://localhost:8084](http://localhost:8084)
+
+Se connecter à l'aide des credentiels : 
+  - User: admin
+  - mdp : admin
+
+Lancer le DAG Aiflow et attendre son éxecution.
 
 Le DAG **`ml_pipeline`** orchestre les étapes :
 
@@ -120,23 +104,32 @@ Le DAG **`ml_pipeline`** orchestre les étapes :
 5. **Evidently** → détection de dérive
 6. **Reload modèle** → recharge via la Gateway
 
-👉 Accès UI Airflow : [http://localhost:8084](http://localhost:8084)
+
+### Linux
+
+```bash
+
+pip install streamlit
+export PATH=$PATH:/home/ubuntu/.local/bin
+streamlit run src/frontend/app.py
+```
+### Windows
+
+```bash
+
+pip install streamlit
+streamlit run src/frontend/app.py
+```
 
 ---
 
-## 🌐 API Gateway (FastAPI)
+## 🌐 API Gateway (Streamlit)
 
-### Healthcheck
+Se connecter à l'interface avec les credentiels :
+ - User : admin
+ - mdp : admin
 
-```bash
-curl http://localhost:8002/health
-```
-
-Réponse :
-
-```json
-{ "status": "OK", "service": "gateway" }
-```
+Lancer une prédiction sur une réference, ex : SKU2_4
 
 ---
 
